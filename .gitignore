@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (user data — do not commit)
+server/uploads/
+
+# Backup files
+*.backup
+
+# Legacy backup (old standalone modules)
+_legacy_backup/
+
+# Production env (never commit secrets)
+.env.production
+
+# Vite cache
+.vite/
+
+# Lock files (optional — remove this line if you want to track them)
+# package-lock.json
