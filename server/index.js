@@ -23,12 +23,23 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
+  "https://campus-one-azure.vercel.app",
   process.env.CLIENT_URL,
-].filter(Boolean);
+].filter(Boolean).map(url => url.replace(/\/$/, "")); // strip trailing slashes
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, Render health checks)
+      if (!origin) return callback(null, true);
+      // Strip trailing slash from incoming origin
+      const cleanOrigin = origin.replace(/\/$/, "");
+      // Allow if in allowedOrigins or any *.vercel.app preview deploy
+      if (allowedOrigins.includes(cleanOrigin) || /\.vercel\.app$/.test(cleanOrigin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
