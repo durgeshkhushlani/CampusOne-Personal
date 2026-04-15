@@ -71,7 +71,7 @@ export default function Login() {
               <path fill="#159779" d="M49,-64C63.2,-54.6,74.1,-39.7,77.7,-23.5C81.4,-7.3,77.7,10.3,69.5,26.4C61.3,42.4,48.5,57,32.7,65C16.9,73,-1.9,74.5,-20.1,70.5C-38.3,66.6,-55.8,57.3,-67.2,42.7C-78.6,28.1,-83.8,8.2,-79.8,-9.6C-75.9,-27.4,-62.7,-43.1,-47.4,-52.7C-32.1,-62.3,-16,-65.9,1.1,-67.3C18.2,-68.8,34.8,-69.1,49,-64Z" transform="translate(100 100) scale(1.1)" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center -ml-2 mt-1">
-               <span className="text-white font-medium text-3xl xl:text-4xl tracking-tight">uniRP<sup className="text-xs xl:text-sm font-normal ml-0.5">™</sup></span>
+               <span className="text-white font-medium text-2xl xl:text-3xl tracking-tight">CampusOne<sup className="text-xs xl:text-sm font-normal ml-0.5">™</sup></span>
             </div>
           </div>
 
@@ -81,7 +81,7 @@ export default function Login() {
             {/* University Logo */}
             <div className="mb-4">
                {/* using user's uploaded logo */}
-               <img src="/images/logo.png" alt="University Logo" className="h-[90px] xl:h-[110px] object-contain mb-8" />
+               <img src="/images/logo-no-bg.png" alt="University Logo" className="h-[90px] xl:h-[110px] object-contain mb-8" />
             </div>
 
             <h1 className="text-[2.6rem] font-bold text-[#e1472e] mb-8 tracking-tight">Login</h1>
@@ -141,14 +141,11 @@ export default function Login() {
                 >
                   {isLoading ? "PLEASE WAIT..." : "LOGIN"}
                 </button>
-                <a href="#" className="text-[13px] font-bold text-gray-900 hover:text-[#e1472e] transition-colors pr-2">
-                  Forgot Password ?
-                </a>
               </div>
             </form>
 
             <div className="mt-12 text-[11px] text-gray-800 font-medium">
-              Powered By - <span className="font-bold text-black">Bloomfield Innovations</span>
+              Powered By - <span className="font-bold text-black">CampusOne Team</span>
             </div>
           </div>
         </div>
@@ -159,7 +156,7 @@ export default function Login() {
         <div className="flex flex-col items-end">
           <span className="text-[13px] font-bold text-gray-900 mb-0 opacity-80 leading-none mr-2">Powered By</span>
           <div className="flex items-start mt-0.5">
-             <span className="text-[1.85rem] font-black text-gray-900 tracking-tighter leading-none mt-1">uniRP<sup className="text-sm font-medium ml-0.5 mt-1">™</sup></span>
+             <span className="text-[1.85rem] font-black text-gray-900 tracking-tighter leading-none mt-1">CampusOne<sup className="text-sm font-medium ml-0.5 mt-1">™</sup></span>
              <div className="w-10 h-10 ml-2 rounded-full border border-gray-500 flex items-center justify-center opacity-70 mt-1">
                {/* Globe outline icon approximation */}
                <svg className="w-6 h-6 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -174,14 +171,8 @@ export default function Login() {
 
       {/* Bottom Social Icons */}
       <div className="absolute bottom-6 w-full flex justify-center items-center gap-[18px] z-20">
-        <a href="#" className="w-8 h-8 rounded-full border border-gray-500 flex items-center justify-center text-gray-700 hover:text-gray-900 hover:bg-gray-400/30 transition-colors">
-          <svg className="w-3.5 h-3.5 fill-current opacity-80" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z" /></svg>
-        </a>
-        <a href="#" className="w-8 h-8 rounded-full border border-gray-500 flex items-center justify-center text-gray-700 hover:text-gray-900 hover:bg-gray-400/30 transition-colors">
-          <svg className="w-3.5 h-3.5 fill-current opacity-80" viewBox="0 0 24 24"><path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16.02 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z" /></svg>
-        </a>
-        <a href="#" className="w-8 h-8 rounded-full border border-gray-500 flex items-center justify-center text-gray-700 hover:text-gray-900 hover:bg-gray-400/30 transition-colors">
-          <svg className="w-3.5 h-3.5 fill-current opacity-80" viewBox="0 0 24 24"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14 9.94 13.4 10.6 13.04 11.23V10.08H10.5V18.5H13.04V14.15C13.04 13 13.25 11.97 14.54 11.97C15.82 11.97 15.96 13.18 15.96 14.24V18.5H18.5M7.05 8.52C7.9 8.52 8.58 7.83 8.58 6.96C8.58 6.1 7.9 5.41 7.05 5.41C6.19 5.41 5.5 6.1 5.5 6.96C5.5 7.83 6.19 8.52 7.05 8.52M5.77 18.5H8.31V10.08H5.77V18.5Z" /></svg>
+        <a href="https://www.linkedin.com/school/daiict/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-gray-500 flex items-center justify-center text-gray-700 hover:text-[#0a66c2] hover:bg-gray-400/30 transition-colors">
+          <svg className="w-4 h-4 fill-current opacity-80" viewBox="0 0 24 24"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14 9.94 13.4 10.6 13.04 11.23V10.08H10.5V18.5H13.04V14.15C13.04 13 13.25 11.97 14.54 11.97C15.82 11.97 15.96 13.18 15.96 14.24V18.5H18.5M7.05 8.52C7.9 8.52 8.58 7.83 8.58 6.96C8.58 6.1 7.9 5.41 7.05 5.41C6.19 5.41 5.5 6.1 5.5 6.96C5.5 7.83 6.19 8.52 7.05 8.52M5.77 18.5H8.31V10.08H5.77V18.5Z" /></svg>
         </a>
       </div>
       
