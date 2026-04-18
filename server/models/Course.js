@@ -8,6 +8,8 @@ const courseSchema = new mongoose.Schema(
     credits: { type: Number, required: true },
     semester: { type: Number, required: true },
     description: { type: String },
+    programObjective: { type: String, default: "To provide students with foundational knowledge and practical skills in the subject domain." },
+    syllabus: { type: [String], default: ["Unit 1: Introduction", "Unit 2: Core Concepts", "Unit 3: Advanced Topics", "Unit 4: Case Studies"] },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

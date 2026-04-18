@@ -48,7 +48,10 @@ export default function HireSphereDashboard() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">💼 HireSphere — Campus Placements</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          HireSphere — Campus Placements
+        </h1>
         {user?.role === "admin" && (
           <Link to="/hiresphere/create-company" className="btn btn-primary btn-sm">
             + Add Company
@@ -60,7 +63,8 @@ export default function HireSphereDashboard() {
       {user?.role === "student" && appliedCompanies.length > 0 && (
         <div className="mb-8">
           <h2 className="text-lg font-semibold mb-3 text-success flex items-center gap-2">
-            ✅ Applied Companies ({appliedCompanies.length})
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Applied Companies ({appliedCompanies.length})
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {appliedCompanies.map((company) => {
@@ -78,7 +82,7 @@ export default function HireSphereDashboard() {
                       <span className="text-xs text-base-content/40">
                         Applied: {new Date(app?.createdAt).toLocaleDateString()}
                       </span>
-                      <span className="badge badge-success badge-sm">Applied ✓</span>
+                      <span className="badge badge-success badge-sm border-0 font-medium">Applied</span>
                     </div>
                   </div>
                 </Link>
@@ -92,7 +96,8 @@ export default function HireSphereDashboard() {
       <div>
         {user?.role === "student" && appliedCompanies.length > 0 && (
           <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            📋 Open Companies ({openCompanies.length})
+            <svg className="w-5 h-5 text-base-content/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            Open Companies ({openCompanies.length})
           </h2>
         )}
 

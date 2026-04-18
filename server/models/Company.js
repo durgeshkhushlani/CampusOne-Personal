@@ -25,6 +25,11 @@ const companySchema = new mongoose.Schema(
         type: String,
       },
     ],
+    resumeType: {
+      type: String,
+      enum: ["file", "link"],
+      default: "file"
+    },
     createdByAdmin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

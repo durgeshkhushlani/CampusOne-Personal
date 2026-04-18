@@ -130,11 +130,24 @@ export default function ProblemDetail() {
               output.status === "Accepted" ? "border-success bg-success/10" : output.status === "Pending" ? "border-info bg-info/10" : "border-error bg-error/10"
             }`}>
               <div className="card-body p-4">
-                <h3 className="font-bold text-sm">Result: {output.status}</h3>
-                {output.message && <p className="text-xs">{output.message}</p>}
-                {output.output && <pre className="text-xs font-mono bg-base-200 p-2 rounded mt-1">{output.output}</pre>}
+                <div className="flex items-center gap-2 mb-2">
+                   <h3 className="font-bold text-sm">Result: {output.status}</h3>
+                   {output.executionTime && <span className="text-xs badge badge-ghost ml-auto">{output.executionTime}s execution time</span>}
+                </div>
+                {output.failedTestCase && <p className="text-xs font-bold text-error mb-1">Failed on Test Case #{output.failedTestCase}</p>}
+                {output.message && <p className="text-xs mb-2 font-medium">{output.message}</p>}
+                
+                {output.output && (
+                  <div className="mt-2">
+                    <span className="text-xs font-semibold text-base-content/70 block mb-1">Your Output:</span>
+                    <pre className="text-sm font-mono bg-base-100 border border-base-300 p-3 rounded-lg overflow-auto">{output.output}</pre>
+                  </div>
+                )}
                 {output.expectedOutput && (
-                  <p className="text-xs mt-1"><strong>Expected:</strong> {output.expectedOutput}</p>
+                  <div className="mt-2">
+                    <span className="text-xs font-semibold text-base-content/70 block mb-1">Expected Output:</span>
+                    <pre className="text-sm font-mono bg-base-100 border border-base-300 p-3 rounded-lg overflow-auto">{output.expectedOutput}</pre>
+                  </div>
                 )}
               </div>
             </div>

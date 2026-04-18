@@ -4,7 +4,7 @@ import api from "../../utils/api";
 
 export default function CreateCompany() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: [""] });
+  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: [""], resumeType: "file" });
   const [creating, setCreating] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -30,13 +30,30 @@ export default function CreateCompany() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">➕ Add Company</h1>
+      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+        Add Company
+      </h1>
       <form onSubmit={handleSubmit} className="card bg-base-100 shadow-lg border border-base-300">
         <div className="card-body space-y-4">
           <input className="input input-bordered w-full" placeholder="Company Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <input className="input input-bordered w-full" placeholder="Role (e.g. SDE Intern)" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} required />
           <textarea className="textarea textarea-bordered w-full" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
           <input type="date" className="input input-bordered w-full" value={form.lastDate} onChange={(e) => setForm({ ...form, lastDate: e.target.value })} required />
+
+          <div className="form-control py-2 border-y border-base-200">
+            <label className="label cursor-pointer justify-start gap-6">
+              <span className="label-text font-medium text-base-content/80">Resume Submission Format:</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="resumeType" className="radio radio-primary radio-sm" value="file" checked={form.resumeType === "file"} onChange={(e) => setForm({ ...form, resumeType: e.target.value })} />
+                <span className="label-text">File Upload (PDF/DOC)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="resumeType" className="radio radio-primary radio-sm" value="link" checked={form.resumeType === "link"} onChange={(e) => setForm({ ...form, resumeType: e.target.value })} />
+                <span className="label-text">Google Drive Link</span>
+              </label>
+            </label>
+          </div>
 
           <div>
             <label className="label"><span className="label-text font-medium">Custom Questions (optional)</span></label>
