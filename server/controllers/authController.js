@@ -47,7 +47,14 @@ const login = async (req, res) => {
     // Fetch profile specific data
     let profile = {};
     if (user.role === "student") {
-      const student = await Student.findOne({ userId: user._id });
+      let student = await Student.findOne({ userId: user._id });
+      if (!student && user.name) {
+        const nameParts = user.name.split(" ");
+        student = await Student.findOne({
+          firstName: new RegExp(`^${nameParts[0]}$`, "i"),
+          lastName: new RegExp(`^${nameParts[nameParts.length - 1]}$`, "i")
+        });
+      }
       if (student) {
         profile = {
           semester: student.semester,
@@ -56,13 +63,21 @@ const login = async (req, res) => {
         };
       }
     } else if (user.role === "faculty") {
-      const faculty = await Faculty.findOne({ userId: user._id });
+      let faculty = await Faculty.findOne({ userId: user._id });
+      if (!faculty && user.name) {
+        const nameParts = user.name.split(" ");
+        faculty = await Faculty.findOne({
+          firstName: new RegExp(`^${nameParts[0]}$`, "i"),
+          lastName: new RegExp(`^${nameParts[nameParts.length - 1]}$`, "i")
+        });
+      }
       if (faculty) {
         profile = {
           department: faculty.department,
         };
       }
     }
+
 
     res.status(200).json({
       success: true,
@@ -104,7 +119,14 @@ const getMe = async (req, res) => {
     // Fetch profile specific data
     let profile = {};
     if (user.role === "student") {
-      const student = await Student.findOne({ userId: user._id });
+      let student = await Student.findOne({ userId: user._id });
+      if (!student && user.name) {
+        const nameParts = user.name.split(" ");
+        student = await Student.findOne({
+          firstName: new RegExp(`^${nameParts[0]}$`, "i"),
+          lastName: new RegExp(`^${nameParts[nameParts.length - 1]}$`, "i")
+        });
+      }
       if (student) {
         profile = {
           semester: student.semester,
@@ -113,13 +135,21 @@ const getMe = async (req, res) => {
         };
       }
     } else if (user.role === "faculty") {
-      const faculty = await Faculty.findOne({ userId: user._id });
+      let faculty = await Faculty.findOne({ userId: user._id });
+      if (!faculty && user.name) {
+        const nameParts = user.name.split(" ");
+        faculty = await Faculty.findOne({
+          firstName: new RegExp(`^${nameParts[0]}$`, "i"),
+          lastName: new RegExp(`^${nameParts[nameParts.length - 1]}$`, "i")
+        });
+      }
       if (faculty) {
         profile = {
           department: faculty.department,
         };
       }
     }
+
 
     res.status(200).json({
       success: true,
