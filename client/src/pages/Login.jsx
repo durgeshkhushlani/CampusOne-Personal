@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { User, Lock, Eye, EyeOff, Twitter, Linkedin, Instagram, Youtube, Facebook } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,167 +16,175 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
     try {
       await login(email, password);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      const message = err.response?.data?.message || "Login failed. Please try again.";
-      setError(message);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const inputStyle = {
+    width: "100%",
+    height: 40,
+    border: "1px solid #D8D5CE",
+    borderRadius: 8,
+    fontSize: 14,
+    color: "#2C3E50",
+    background: "#FFFFFF",
+    outline: "none",
+    transition: "all 150ms ease",
+    fontFamily: "inherit",
+  };
+
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-gray-100 flex items-center font-sans">
-      {/* Main Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/images/bg.jpg" 
-          alt="Campus Background" 
-          className="w-full h-full object-cover"
-        />
-        {/* Subtle orange/warm overlay to match the sunset feel in the original background if needed */}
-      </div>
-
-      {/* Foreground Content wrapper */}
-      <div className="relative z-10 w-full h-screen flex">
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "#8C2E2E url(/images/campus_login_bg.png) no-repeat center center",
+      backgroundSize: "cover",
+      padding: "16px",
+    }}>
+      
+      {/* Login Container Card */}
+      <div style={{
+        display: "flex",
+        width: "900px",
+        height: "550px",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 24px 48px rgba(0, 0, 0, 0.3)",
+        background: "#FFFFFF",
+      }}>
         
-        {/* Left Beige Panel Section */}
-        <div className="relative w-full md:w-[65%] lg:w-[45%] xl:w-[40%] flex flex-col justify-center min-h-screen">
+        {/* Left Panel (Teal Student Illustration) */}
+        <div style={{
+          width: "42%",
+          background: "#7BD3CB url(/images/student_login_illustration.png) no-repeat center center",
+          backgroundSize: "cover",
+        }} className="hidden md:block" />
+
+        {/* Right Panel (Form Content) */}
+        <div style={{
+          flex: 1,
+          background: "#FAF5E6",
+          padding: "40px 48px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          color: "#5C4033",
+        }}>
           
-          {/* Beige Curve Shape */}
-          <div className="absolute top-0 left-0 w-[140%] h-[120%] -top-[10%] z-0 pointer-events-none drop-shadow-2xl">
-            <svg 
-              className="w-full h-full" 
-              viewBox="0 0 100 100" 
-              preserveAspectRatio="none" 
-              fill="#F4E3CC"
-            >
-              {/* This path creates the specific curve matching the screenshot closely */}
-              <path d="M0,0 L60,0 C90,20 85,50 65,75 C55,85 40,95 0,100 Z" />
-            </svg>
-          </div>
-          
-          {/* Subtle secondary beige shapes */}
-          <div className="absolute top-[10%] left-[80%] z-0 pointer-events-none mix-blend-multiply opacity-50">
-             <svg width="100" height="100" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="#E6D3B8"/>
-             </svg>
+          {/* Top row */}
+          <div>
+            <span style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", color: "#8C2E2E", fontWeight: 600 }}>
+              Welcome Back
+            </span>
+            <h2 style={{ fontSize: 24, fontWeight: 600, color: "#2C3E50", marginTop: "4px", marginBottom: "0px" }}>
+              CampusOne Portal
+            </h2>
           </div>
 
-          {/* Green uniRP Blob */}
-          <div className="absolute top-[10%] left-[65%] sm:left-[75%] md:left-[80%] z-10 transform -translate-x-1/2 w-48 h-40 xl:w-56 xl:h-48 pointer-events-none drop-shadow-lg">
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <path fill="#159779" d="M49,-64C63.2,-54.6,74.1,-39.7,77.7,-23.5C81.4,-7.3,77.7,10.3,69.5,26.4C61.3,42.4,48.5,57,32.7,65C16.9,73,-1.9,74.5,-20.1,70.5C-38.3,66.6,-55.8,57.3,-67.2,42.7C-78.6,28.1,-83.8,8.2,-79.8,-9.6C-75.9,-27.4,-62.7,-43.1,-47.4,-52.7C-32.1,-62.3,-16,-65.9,1.1,-67.3C18.2,-68.8,34.8,-69.1,49,-64Z" transform="translate(100 100) scale(1.1)" />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center -ml-2 mt-1">
-               <span className="text-white font-medium text-2xl xl:text-3xl tracking-tight">CampusOne<sup className="text-xs xl:text-sm font-normal ml-0.5">™</sup></span>
-            </div>
-          </div>
-
-          {/* Form Content */}
-          <div className="relative z-20 px-8 sm:px-16 xl:pl-28 w-full max-w-lg mt-10">
-            
-            {/* University Logo */}
-            <div className="mb-4">
-               {/* using user's uploaded logo */}
-               <img src="/images/logo-no-bg.png" alt="University Logo" className="h-[90px] xl:h-[110px] object-contain mb-8" />
-            </div>
-
-            <h1 className="text-[2.6rem] font-bold text-[#e1472e] mb-8 tracking-tight">Login</h1>
-
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ margin: "24px 0" }}>
             {error && (
-              <div className="bg-red-100 border border-red-300 text-red-700 rounded p-3 mb-4 text-sm font-medium">
+              <div style={{ background: "#FBF0F0", color: "#C17B7B", fontSize: 13, padding: "10px 14px", borderRadius: 8, marginBottom: 16, border: "1px solid #EDD5D5" }}>
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="w-full xl:w-[95%]">
-              {/* Username Input */}
-              <div className="mb-5">
+            {/* ID Input */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#2C3E50", marginBottom: 6 }}>
+                Enrollment No. / EMP Code
+              </label>
+              <div style={{ position: "relative" }}>
+                <User size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#8A94A0" }} />
                 <input
                   type="text"
-                  placeholder="Roll / Enrollment No / EMP Code"
-                  className="w-full bg-transparent border border-[#DCB796] text-gray-800 placeholder-[#9a8471] rounded-md px-4 py-3 focus:outline-none focus:border-[#e1472e] transition-colors shadow-sm"
+                  style={{ ...inputStyle, paddingLeft: 36, paddingRight: 12 }}
+                  placeholder="Enter your ID"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   required
+                  onFocus={e => { e.target.style.borderColor = "#8C2E2E"; e.target.style.boxShadow = "0 0 0 3px rgba(140,46,46,0.12)"; }}
+                  onBlur={e => { e.target.style.borderColor = "#D8D5CE"; e.target.style.boxShadow = "none"; }}
                 />
               </div>
+            </div>
 
-              {/* Password Input */}
-              <div className="mb-8 relative">
+            {/* Password Input */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "#2C3E50", marginBottom: 6 }}>
+                Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <Lock size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#8A94A0" }} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className="w-full bg-transparent border border-[#DCB796] text-gray-800 placeholder-[#9a8471] rounded-md px-4 py-3 focus:outline-none focus:border-[#e1472e] transition-colors shadow-sm pr-12"
+                  style={{ ...inputStyle, paddingLeft: 36, paddingRight: 40 }}
+                  placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   required
+                  onFocus={e => { e.target.style.borderColor = "#8C2E2E"; e.target.style.boxShadow = "0 0 0 3px rgba(140,46,46,0.12)"; }}
+                  onBlur={e => { e.target.style.borderColor = "#D8D5CE"; e.target.style.boxShadow = "none"; }}
                 />
-                <button 
-                  type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-black focus:outline-none"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                     {showPassword ? (
-                       <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                     ) : (
-                       <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                     )}
-                     {!showPassword && (
-                       <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                     )}
-                  </svg>
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
                 <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`bg-[#De3f2b] text-white px-9 py-2.5 rounded-md text-[13px] font-bold tracking-wider shadow-sm transition-colors ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#C92F1A]"}`}
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#8A94A0", background: "none", border: "none", cursor: "pointer", display: "flex" }}
                 >
-                  {isLoading ? "PLEASE WAIT..." : "LOGIN"}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-            </form>
+            </div>
 
-            <div className="mt-12 text-[11px] text-gray-800 font-medium">
-              Powered By - <span className="font-bold text-black">CampusOne Team</span>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: "100%", height: 42, background: isLoading ? "#C48E8E" : "#8C2E2E",
+                color: "#FFFFFF", fontSize: 14, fontWeight: 600, border: "none",
+                borderRadius: 8, cursor: isLoading ? "wait" : "pointer",
+                transition: "all 150ms ease", fontFamily: "inherit",
+              }}
+              onMouseEnter={e => { if (!isLoading) e.currentTarget.style.background = "#6B1F1F"; }}
+              onMouseLeave={e => { if (!isLoading) e.currentTarget.style.background = "#8C2E2E"; }}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          {/* Footer block */}
+          <div>
+            <div style={{ fontSize: 11, color: "#A6907A", fontWeight: 500 }}>Contact Us</div>
+            <div style={{ fontSize: 12, color: "#5C4033", margin: "2px 0 12px" }}>
+              info@campusone.edu &nbsp;|&nbsp; +91 99999 99999
+            </div>
+
+            <div style={{ fontSize: 11, color: "#A6907A", fontWeight: 500, marginBottom: 6 }}>Connect with us</div>
+            <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+              <Twitter size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              <Linkedin size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              <Instagram size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              <Youtube size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              <Facebook size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+            </div>
+
+            <div style={{ fontSize: 10, color: "#A6907A", borderTop: "1px solid #E8DCC4", paddingTop: "8px" }}>
+              Terms & Policies
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Top Right Header - "Powered By uniRP" */}
-      <div className="absolute top-6 right-8 lg:top-[2.5rem] lg:right-[3rem] z-20 hidden md:block">
-        <div className="flex flex-col items-end">
-          <span className="text-[13px] font-bold text-gray-900 mb-0 opacity-80 leading-none mr-2">Powered By</span>
-          <div className="flex items-start mt-0.5">
-             <span className="text-[1.85rem] font-black text-gray-900 tracking-tighter leading-none mt-1">CampusOne<sup className="text-sm font-medium ml-0.5 mt-1">™</sup></span>
-             <div className="w-10 h-10 ml-2 rounded-full border border-gray-500 flex items-center justify-center opacity-70 mt-1">
-               {/* Globe outline icon approximation */}
-               <svg className="w-6 h-6 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  <path d="M2 12h20"/>
-               </svg>
-             </div>
-          </div>
         </div>
-      </div>
 
-      {/* Bottom Social Icons */}
-      <div className="absolute bottom-6 w-full flex justify-center items-center gap-[18px] z-20">
-        <a href="https://www.linkedin.com/school/daiict/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-gray-500 flex items-center justify-center text-gray-700 hover:text-[#0a66c2] hover:bg-gray-400/30 transition-colors">
-          <svg className="w-4 h-4 fill-current opacity-80" viewBox="0 0 24 24"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14 9.94 13.4 10.6 13.04 11.23V10.08H10.5V18.5H13.04V14.15C13.04 13 13.25 11.97 14.54 11.97C15.82 11.97 15.96 13.18 15.96 14.24V18.5H18.5M7.05 8.52C7.9 8.52 8.58 7.83 8.58 6.96C8.58 6.1 7.9 5.41 7.05 5.41C6.19 5.41 5.5 6.1 5.5 6.96C5.5 7.83 6.19 8.52 7.05 8.52M5.77 18.5H8.31V10.08H5.77V18.5Z" /></svg>
-        </a>
       </div>
-      
     </div>
   );
 }

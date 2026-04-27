@@ -20,6 +20,7 @@ const classroomSubmissionSchema = new mongoose.Schema(
       enum: ["submitted", "graded", "returned"],
       default: "submitted",
     },
+    isLate: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

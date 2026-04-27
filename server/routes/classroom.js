@@ -37,11 +37,19 @@ router.delete("/classrooms/:id", requireRole("admin"), classroomCtrl.deleteClass
 // ========================
 router.post("/posts", requireRole("faculty", "admin"), upload.single("file"), postCtrl.createPost);
 router.get("/posts/:classroom_id", requireRole("student", "faculty", "admin"), postCtrl.getPostsByClassroom);
+router.get("/posts/post/:post_id", requireRole("student", "faculty", "admin"), postCtrl.getPostById);
 router.post("/posts/:post_id/submit", requireRole("student"), upload.single("file"), postCtrl.submitAssignment);
+router.delete("/posts/:post_id/submit", requireRole("student"), postCtrl.unsubmitAssignment);
 router.get("/posts/:post_id/my-submission", requireRole("student"), postCtrl.getMySubmission);
 router.get("/posts/:post_id/submissions", requireRole("faculty", "admin"), postCtrl.getSubmissions);
 router.put("/posts/submissions/:submission_id/grade", requireRole("faculty", "admin"), postCtrl.gradeSubmission);
 router.get("/posts/:post_id/comments", requireRole("student", "faculty", "admin"), postCtrl.getComments);
 router.post("/posts/:post_id/comments", requireRole("student", "faculty", "admin"), postCtrl.addComment);
+router.put("/posts/:post_id/pin", requireRole("faculty", "admin"), postCtrl.togglePinPost);
+
+// ========================
+// Student Grade Summary
+// ========================
+router.get("/classrooms/:id/my-grades", requireRole("student"), postCtrl.getMyGrades);
 
 module.exports = router;

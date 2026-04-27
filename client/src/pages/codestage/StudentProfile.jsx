@@ -1,28 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../utils/api";
 
 export default function StudentProfile() {
   const { user } = useAuth();
   
-  // Boilerplate data for now
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const stats = {
-    totalSolved: 124,
-    easy: 60,
-    medium: 50,
-    hard: 14,
-    totalEasy: 200,
-    totalMedium: 300,
-    totalHard: 100,
-  };
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalSolved: 0,
+    easySolved: 0,
+    mediumSolved: 0,
+    hardSolved: 0,
+    totalEasy: 0,
+    totalMedium: 0,
+    totalHard: 0,
+  });
+  const [recentSubmissions, setRecentSubmissions] = useState([]);
 
-  const recentSubmissions = [
-    { id: 1, title: "Two Sum", difficulty: "easy", language: "cpp", date: "2 days ago", status: "Accepted" },
-    { id: 2, title: "Longest Substring", difficulty: "medium", language: "python", date: "3 days ago", status: "Accepted" },
-    { id: 3, title: "Median of Two Sorted Arrays", difficulty: "hard", language: "java", date: "1 week ago", status: "Wrong Answer" },
-  ];
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get("/codestage/profile/me");
+        setStats({
+          totalSolved: res.data.totalSolved,
+          easySolved: res.data.easySolved,
+          mediumSolved: res.data.mediumSolved,
+          hardSolved: res.data.hardSolved,
+          totalEasy: res.data.totalEasy,
+          totalMedium: res.data.totalMedium,
+          totalHard: res.data.totalHard,
+        });
+        setRecentSubmissions(res.data.recentSubmissions || []);
+      } catch (err) {
+        console.error("Profile fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const totalProblems = stats.totalEasy + stats.totalMedium + stats.totalHard;
+  const solvedPercent = totalProblems > 0 ? Math.round((stats.totalSolved / totalProblems) * 100) : 0;
+
+  // Client-side filter by problem title
+  const filteredSubmissions = recentSubmissions.filter((sub) =>
+    (sub.problemId?.title || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading)
+    return (
+      <div className="flex justify-center p-10">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
 
   return (
     <div className="p-6 max-w-5xl mx-auto min-h-[calc(100vh-64px)]">
@@ -36,14 +69,13 @@ export default function StudentProfile() {
            <div className="relative">
               <input 
                 type="text" 
-                placeholder="Search students..." 
+                placeholder="Search submissions..." 
                 className="input input-bordered input-sm w-full max-w-xs pr-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <svg className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
            </div>
-           <button className="btn btn-primary btn-sm">Search</button>
         </div>
       </div>
 
@@ -55,12 +87,12 @@ export default function StudentProfile() {
               <h2 className="card-title text-base border-b pb-2">Problem Solving Stats</h2>
               
               <div className="flex items-center gap-4 py-4">
-                 <div className="radial-progress text-primary" style={{"--value": Math.round((stats.totalSolved / (stats.totalEasy+stats.totalMedium+stats.totalHard)) * 100), "--size": "4rem", "--thickness": "4px"}} role="progressbar">
+                 <div className="radial-progress text-primary" style={{"--value": solvedPercent, "--size": "4rem", "--thickness": "4px"}} role="progressbar">
                     <span className="text-sm font-bold text-base-content">{stats.totalSolved}</span>
                  </div>
                  <div>
                     <p className="text-xs text-base-content/60">Total Solved</p>
-                    <p className="font-semibold text-lg">{Math.round((stats.totalSolved / (stats.totalEasy+stats.totalMedium+stats.totalHard)) * 100)}%</p>
+                    <p className="font-semibold text-lg">{solvedPercent}%</p>
                  </div>
               </div>
 
@@ -68,23 +100,23 @@ export default function StudentProfile() {
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-success font-medium">Easy</span>
-                    <span>{stats.easy} / {stats.totalEasy}</span>
+                    <span>{stats.easySolved} / {stats.totalEasy}</span>
                   </div>
-                  <progress className="progress progress-success w-full" value={stats.easy} max={stats.totalEasy}></progress>
+                  <progress className="progress progress-success w-full" value={stats.easySolved} max={stats.totalEasy || 1}></progress>
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-warning font-medium">Medium</span>
-                    <span>{stats.medium} / {stats.totalMedium}</span>
+                    <span>{stats.mediumSolved} / {stats.totalMedium}</span>
                   </div>
-                  <progress className="progress progress-warning w-full" value={stats.medium} max={stats.totalMedium}></progress>
+                  <progress className="progress progress-warning w-full" value={stats.mediumSolved} max={stats.totalMedium || 1}></progress>
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-error font-medium">Hard</span>
-                    <span>{stats.hard} / {stats.totalHard}</span>
+                    <span>{stats.hardSolved} / {stats.totalHard}</span>
                   </div>
-                  <progress className="progress progress-error w-full" value={stats.hard} max={stats.totalHard}></progress>
+                  <progress className="progress progress-error w-full" value={stats.hardSolved} max={stats.totalHard || 1}></progress>
                 </div>
               </div>
             </div>
@@ -108,23 +140,29 @@ export default function StudentProfile() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentSubmissions.map(sub => (
-                      <tr key={sub.id}>
-                        <td>
-                          <div className="font-medium text-sm">{sub.title}</div>
-                          <div className={`badge badge-xs mt-1 ${sub.difficulty === 'easy' ? 'badge-success' : sub.difficulty === 'medium' ? 'badge-warning' : 'badge-error'}`}>
-                            {sub.difficulty}
-                          </div>
-                        </td>
-                        <td><span className="badge badge-ghost badge-sm">{sub.language}</span></td>
-                        <td>
-                           <span className={`text-xs font-bold ${sub.status === 'Accepted' ? 'text-success' : 'text-error'}`}>
-                             {sub.status}
-                           </span>
-                        </td>
-                        <td className="text-xs text-base-content/60">{sub.date}</td>
-                      </tr>
-                    ))}
+                    {filteredSubmissions.length === 0 ? (
+                      <tr><td colSpan="4" className="text-center py-4 text-base-content/50">No submissions found.</td></tr>
+                    ) : (
+                      filteredSubmissions.map((sub) => (
+                        <tr key={sub._id}>
+                          <td>
+                            <Link to={`/codestage/problems/${sub.problemId?._id}`} className="font-medium text-sm link link-primary">
+                              {sub.problemId?.title || "Unknown"}
+                            </Link>
+                            <div className={`badge badge-xs mt-1 ${sub.problemId?.difficulty === 'easy' ? 'badge-success' : sub.problemId?.difficulty === 'medium' ? 'badge-warning' : 'badge-error'}`}>
+                              {sub.problemId?.difficulty || "—"}
+                            </div>
+                          </td>
+                          <td><span className="badge badge-ghost badge-sm">{sub.language}</span></td>
+                          <td>
+                             <span className={`text-xs font-bold ${sub.status === 'Accepted' ? 'text-success' : 'text-error'}`}>
+                               {sub.status}
+                             </span>
+                          </td>
+                          <td className="text-xs text-base-content/60">{new Date(sub.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

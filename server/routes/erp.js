@@ -5,6 +5,7 @@ const studentCtrl = require("../controllers/erp/studentController");
 const facultyCtrl = require("../controllers/erp/facultyController");
 const courseCtrl = require("../controllers/erp/courseController");
 const adminCtrl = require("../controllers/erp/adminController");
+const erpExtCtrl = require("../controllers/erp/erpEnhancementController");
 
 // All ERP routes require authentication
 router.use(verifyToken);
@@ -29,6 +30,7 @@ router.get("/students/me/timetable", requireRole("student"), (req, res, next) =>
   req.params.id = "me";
   studentCtrl.getStudentTimetable(req, res, next);
 });
+router.put("/students/me/profile", requireRole("student"), erpExtCtrl.updateMyProfile);
 
 // Admin-level student management
 router.get("/students", requireRole("admin"), studentCtrl.getAllStudents);
@@ -65,12 +67,20 @@ router.delete("/faculty/:id", requireRole("admin"), facultyCtrl.deleteFaculty);
 // Course Routes
 // ========================
 router.get("/courses", requireRole("student", "faculty", "admin"), courseCtrl.getAllCourses);
-router.get("/courses/:id", requireRole("student", "faculty", "admin"), courseCtrl.getCourseById);
 router.post("/courses", requireRole("admin"), courseCtrl.createCourse);
+
+// Exam routes (MUST be before /courses/:id to avoid param conflict)
+router.get("/courses/exams/list", requireRole("student", "faculty", "admin"), courseCtrl.getExams);
+router.get("/courses/exams/results/me", requireRole("student"), erpExtCtrl.getMyResults);
+router.get("/courses/exams/results/:studentId", requireRole("student", "faculty", "admin"), courseCtrl.getStudentResults);
+router.get("/courses/exams/by-faculty", requireRole("faculty"), erpExtCtrl.getExamsByFaculty);
+router.get("/courses/exams/:examId/results", requireRole("faculty", "admin"), erpExtCtrl.getResultsByExam);
+router.post("/courses/exams", requireRole("faculty", "admin"), erpExtCtrl.createExam);
+router.post("/courses/exams/results", requireRole("faculty", "admin"), erpExtCtrl.createOrUpdateResult);
+
+router.get("/courses/:id", requireRole("student", "faculty", "admin"), courseCtrl.getCourseById);
 router.put("/courses/:id", requireRole("admin"), courseCtrl.updateCourse);
 router.delete("/courses/:id", requireRole("admin"), courseCtrl.deleteCourse);
-router.get("/courses/exams/list", requireRole("student", "faculty", "admin"), courseCtrl.getExams);
-router.get("/courses/exams/results/:studentId", requireRole("student", "faculty", "admin"), courseCtrl.getStudentResults);
 
 // ========================
 // Admin Routes

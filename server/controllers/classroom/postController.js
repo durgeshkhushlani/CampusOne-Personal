@@ -6,7 +6,7 @@ const User = require("../../models/User");
 // POST /api/classroom/posts
 const createPost = async (req, res) => {
   try {
-    const { classroom_id, title, content, type, due_date, total_points } = req.body;
+    const { classroom_id, title, content, type, due_date, total_points, topic } = req.body;
     const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
     const fileName = req.file ? req.file.originalname : null;
 
@@ -17,6 +17,7 @@ const createPost = async (req, res) => {
       fileUrl, fileName,
       dueDate: due_date || null,
       totalPoints: total_points || 100,
+      topic: topic || "General",
     });
 
     res.status(201).json(post);
@@ -64,6 +65,10 @@ const submitAssignment = async (req, res) => {
     const fileName = req.file ? req.file.originalname : null;
     if (!fileUrl) return res.status(400).json({ error: "File is required" });
 
+    // Check if submission is late
+    const post = await Post.findById(req.params.post_id);
+    const isLate = post && post.dueDate ? new Date() > new Date(post.dueDate) : false;
+
     const existing = await ClassroomSubmission.findOne({
       postId: req.params.post_id,
       studentId: req.user.userId,
@@ -73,12 +78,14 @@ const submitAssignment = async (req, res) => {
       existing.fileUrl = fileUrl;
       existing.fileName = fileName;
       existing.status = "submitted";
+      existing.isLate = isLate;
       await existing.save();
     } else {
       await ClassroomSubmission.create({
         postId: req.params.post_id,
         studentId: req.user.userId,
         fileUrl, fileName,
+        isLate,
       });
     }
 
@@ -154,13 +161,105 @@ const addComment = async (req, res) => {
   }
 };
 
+// GET /api/classroom/classrooms/:id/my-grades — Student grade summary
+const getMyGrades = async (req, res) => {
+  try {
+    const classroomId = req.params.id;
+    const studentId = req.user.userId;
+
+    // Find all assignment posts for this classroom
+    const assignments = await Post.find({ classroomId, type: "assignment" }).sort({ createdAt: -1 });
+
+    const grades = await Promise.all(
+      assignments.map(async (post) => {
+        const submission = await ClassroomSubmission.findOne({ postId: post._id, studentId });
+        return {
+          postId: post._id,
+          postTitle: post.title,
+          totalPoints: post.totalPoints,
+          grade: submission ? submission.grade : null,
+          status: submission ? submission.status : "not_submitted",
+          dueDate: post.dueDate,
+          isLate: submission ? submission.isLate : false,
+        };
+      })
+    );
+
+    res.json(grades);
+  } catch (error) {
+    console.error("Get my grades error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// PUT /api/classroom/posts/:post_id/pin — Toggle pin
+const togglePinPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    post.isPinned = !post.isPinned;
+    await post.save();
+
+    res.json({ message: post.isPinned ? "Post pinned" : "Post unpinned", isPinned: post.isPinned });
+  } catch (error) {
+    console.error("Toggle pin error:", error);
+    res.status(500).json({ error: "Failed to toggle pin" });
+  }
+};
+
+// GET /api/classroom/posts/post/:post_id
+const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id).populate("authorId", "name");
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    
+    let submissionCount = 0;
+    if (post.type === "assignment") {
+      submissionCount = await ClassroomSubmission.countDocuments({ postId: post._id });
+    }
+    const commentCount = await Comment.countDocuments({ postId: post._id });
+
+    const result = {
+      ...post.toObject(),
+      author_name: post.authorId?.name || "Unknown",
+      submission_count: submissionCount,
+      comment_count: commentCount,
+    };
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// DELETE /api/classroom/posts/:post_id/submit
+const unsubmitAssignment = async (req, res) => {
+  try {
+    const existing = await ClassroomSubmission.findOne({
+      postId: req.params.post_id,
+      studentId: req.user.userId,
+    });
+    if (!existing) return res.status(404).json({ error: "Submission not found" });
+    if (existing.status === "graded") return res.status(400).json({ error: "Cannot unsubmit a graded assignment" });
+    
+    await existing.deleteOne();
+    res.json({ message: "Unsubmitted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Unsubmit failed" });
+  }
+};
+
 module.exports = {
   createPost,
   getPostsByClassroom,
+  getPostById,
   submitAssignment,
+  unsubmitAssignment,
   getMySubmission,
   getSubmissions,
   gradeSubmission,
   getComments,
   addComment,
+  getMyGrades,
+  togglePinPost,
 };

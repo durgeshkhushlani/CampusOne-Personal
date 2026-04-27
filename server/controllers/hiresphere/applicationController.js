@@ -37,6 +37,26 @@ const submitApplication = async (req, res) => {
     const company = await Company.findById(companyId);
     if (!company) return res.status(404).json({ message: "Company not found" });
 
+    // ── Eligibility Check ──
+    const studentProfile = await getStudentProfile(studentId);
+    if (studentProfile) {
+      // Check CGPA: try from form answers first, fallback to profile if it has cgpa
+      const parsedAns = typeof answers === "string" ? JSON.parse(answers) : answers;
+      const cgpaStr = extractCGPA(parsedAns || []);
+      const studentCGPA = cgpaStr !== "N/A" ? parseFloat(cgpaStr) : (studentProfile.cgpa || 0);
+      if (company.minCGPA && company.minCGPA > 0 && studentCGPA < company.minCGPA) {
+        return res.status(403).json({ message: "You do not meet the eligibility criteria for this company." });
+      }
+      // Check branch/department
+      if (company.eligibleBranches && company.eligibleBranches.length > 0) {
+        const dept = (studentProfile.department || "").toLowerCase().trim();
+        const eligible = company.eligibleBranches.map(b => b.toLowerCase().trim());
+        if (!eligible.includes(dept)) {
+          return res.status(403).json({ message: "You do not meet the eligibility criteria for this company." });
+        }
+      }
+    }
+
     let resumePath = "";
     if (req.file) {
       resumePath = req.file.filename;
@@ -196,4 +216,74 @@ const getStudentApplications = async (req, res) => {
   }
 };
 
-module.exports = { submitApplication, getApplicationsByCompany, downloadResumes, exportApplicationsExcel, getStudentApplications };
+module.exports = { submitApplication, getApplicationsByCompany, downloadResumes, exportApplicationsExcel, getStudentApplications, updateApplicationStatus, withdrawApplication, getPlacementStats };
+
+// PUT /api/hiresphere/applications/:applicationId/status — Admin only
+async function updateApplicationStatus(req, res) {
+  try {
+    const { status } = req.body;
+    const validStatuses = ["applied", "shortlisted", "rejected", "selected"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+    const application = await Application.findByIdAndUpdate(
+      req.params.applicationId,
+      { status },
+      { new: true }
+    );
+    if (!application) return res.status(404).json({ message: "Application not found" });
+    res.json(application);
+  } catch (error) {
+    console.error("Update application status error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// DELETE /api/hiresphere/applications/:applicationId — Student only
+async function withdrawApplication(req, res) {
+  try {
+    const application = await Application.findById(req.params.applicationId);
+    if (!application) return res.status(404).json({ message: "Application not found" });
+
+    if (application.studentId.toString() !== req.user.userId.toString()) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    if (application.status !== "applied") {
+      return res.status(400).json({ message: "Cannot withdraw — application has already been processed" });
+    }
+
+    await application.deleteOne();
+    res.json({ message: "Application withdrawn successfully" });
+  } catch (error) {
+    console.error("Withdraw application error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// GET /api/hiresphere/stats — Admin only
+async function getPlacementStats(req, res) {
+  try {
+    const totalCompanies = await Company.countDocuments();
+    const totalApplications = await Application.countDocuments();
+    const totalSelected = await Application.countDocuments({ status: "selected" });
+
+    // Top company: company with most selected students
+    const topCompanyAgg = await Application.aggregate([
+      { $match: { status: "selected" } },
+      { $group: { _id: "$companyId", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 1 },
+    ]);
+
+    let topCompany = null;
+    if (topCompanyAgg.length > 0) {
+      const comp = await Company.findById(topCompanyAgg[0]._id).select("name");
+      topCompany = { name: comp?.name || "Unknown", selectedCount: topCompanyAgg[0].count };
+    }
+
+    res.json({ totalCompanies, totalApplications, totalSelected, topCompany });
+  } catch (error) {
+    console.error("Get placement stats error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}

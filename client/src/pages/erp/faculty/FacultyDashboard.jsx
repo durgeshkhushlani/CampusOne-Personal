@@ -41,6 +41,7 @@ export default function FacultyDashboard() {
                   <a href="/erp/faculty/courses" className="btn btn-sm btn-outline justify-start">My Courses</a>
                   <a href="/erp/faculty/attendance" className="btn btn-sm btn-outline justify-start">Mark Student Attendance</a>
                   <a href="/erp/faculty/timetable" className="btn btn-sm btn-outline justify-start">Timetable</a>
+                  <a href="/erp/faculty/exams" className="btn btn-sm btn-outline justify-start">📝 Exams & Results</a>
                 </div>
               </div>
             </div>

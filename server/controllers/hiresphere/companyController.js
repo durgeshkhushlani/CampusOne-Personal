@@ -4,7 +4,7 @@ const User = require("../../models/User");
 // POST /api/hiresphere/companies
 const createCompany = async (req, res) => {
   try {
-    const { name, role, description, formQuestions, lastDate } = req.body;
+    const { name, role, description, formQuestions, lastDate, minCGPA, eligibleBranches } = req.body;
 
     const company = await Company.create({
       name,
@@ -12,6 +12,8 @@ const createCompany = async (req, res) => {
       description,
       lastDate,
       formQuestions: formQuestions || [],
+      minCGPA: minCGPA || 0,
+      eligibleBranches: eligibleBranches || [],
       createdByAdmin: req.user.userId,
     });
 
@@ -48,7 +50,7 @@ const getCompanyById = async (req, res) => {
 // PUT /api/hiresphere/companies/:id
 const updateCompany = async (req, res) => {
   try {
-    const { name, role, description, formQuestions, lastDate } = req.body;
+    const { name, role, description, formQuestions, lastDate, minCGPA, eligibleBranches } = req.body;
     const company = await Company.findById(req.params.id);
 
     if (!company) return res.status(404).json({ message: "Company not found" });
@@ -62,6 +64,8 @@ const updateCompany = async (req, res) => {
     if (description) company.description = description;
     if (lastDate) company.lastDate = lastDate;
     if (formQuestions) company.formQuestions = formQuestions;
+    if (minCGPA !== undefined) company.minCGPA = minCGPA;
+    if (eligibleBranches !== undefined) company.eligibleBranches = eligibleBranches;
 
     await company.save();
     res.json(company);

@@ -23,6 +23,8 @@ const postSchema = new mongoose.Schema(
     fileName: { type: String },
     dueDate: { type: Date },
     totalPoints: { type: Number, default: 100 },
+    topic: { type: String, default: "General" },
+    isPinned: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

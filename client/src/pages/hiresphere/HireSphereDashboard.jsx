@@ -2,137 +2,173 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
+import { Briefcase, Search, Calendar, Plus } from "lucide-react";
 
 export default function HireSphereDashboard() {
   const { user } = useAuth();
   const [companies, setCompanies] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterTab, setFilterTab] = useState("All");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const compRes = await api.get("/hiresphere/companies");
-        setCompanies(compRes.data);
-
-        // Fetch student's own applications
-        if (user?.role === "student") {
-          const appRes = await api.get("/hiresphere/applications/student");
-          setApplications(appRes.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      const compRes = await api.get("/hiresphere/companies");
+      setCompanies(compRes.data);
+      if (user?.role === "student") {
+        const appRes = await api.get("/hiresphere/applications/student");
+        setApplications(appRes.data);
       }
-    };
-    fetchData();
-  }, [user]);
-
-  // Check if student has applied to a company
-  const hasApplied = (companyId) => {
-    return applications.some((app) => app.companyId?._id === companyId);
+      if (user?.role === "admin") {
+        try { const s = await api.get("/hiresphere/stats"); setStats(s.data); } catch {}
+      }
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
-  // Split companies for student view
-  const appliedCompanies = companies.filter((c) => hasApplied(c._id));
-  const openCompanies = companies.filter((c) => !hasApplied(c._id));
+  useEffect(() => { fetchData(); }, [user]);
 
-  if (loading)
-    return (
-      <div className="flex justify-center p-10">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
+  const hasApplied = (cid) => applications.some(a => a.companyId?._id === cid);
+
+  if (loading) return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh", background: "#F7F6F2" }}>
+      <span className="loading loading-spinner loading-lg" style={{ color: "#5B8DB8" }}></span>
+    </div>
+  );
+
+  const filteredCompanies = companies.filter(c => {
+    const q = searchTerm.toLowerCase();
+    const matches = c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q);
+    const expired = new Date(c.lastDate) < new Date();
+    const days = (new Date(c.lastDate) - new Date()) / 86400000;
+    const soon = days >= 0 && days <= 7;
+    if (filterTab === "Open") return matches && !expired;
+    if (filterTab === "Deadline Soon") return matches && soon && !expired;
+    return matches;
+  });
+
+  const btnPrimary = {
+    display: "flex", alignItems: "center", gap: 6, background: "#5B8DB8",
+    color: "#FFFFFF", fontSize: 14, fontWeight: 500, padding: "9px 18px",
+    borderRadius: 8, border: "none", cursor: "pointer", textDecoration: "none",
+    transition: "all 150ms ease",
+  };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-          HireSphere — Campus Placements
-        </h1>
-        {user?.role === "admin" && (
-          <Link to="/hiresphere/create-company" className="btn btn-primary btn-sm">
-            + Add Company
-          </Link>
-        )}
-      </div>
+    <div style={{ minHeight: "100vh", background: "#F7F6F2", padding: "32px 16px" }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
-      {/* ─── Student: Applied Companies Section ─── */}
-      {user?.role === "student" && appliedCompanies.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-3 text-success flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            Applied Companies ({appliedCompanies.length})
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {appliedCompanies.map((company) => {
-              const app = applications.find((a) => a.companyId?._id === company._id);
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+          <div>
+            <h1 style={{ fontSize: 22, fontWeight: 600, color: "#2C3E50", display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
+              <Briefcase size={20} color="#B89B6B" /> HireSphere
+            </h1>
+            <p style={{ fontSize: 13, color: "#8A94A0", margin: "4px 0 28px" }}>Browse open opportunities from recruiting companies</p>
+          </div>
+          {user?.role === "admin" && (
+            <Link to="/hiresphere/create-company" style={btnPrimary}
+              onMouseEnter={e => e.currentTarget.style.background = "#4A7BA6"}
+              onMouseLeave={e => e.currentTarget.style.background = "#5B8DB8"}>
+              <Plus size={16} /> Add Company
+            </Link>
+          )}
+        </div>
+
+        {/* Admin stats */}
+        {user?.role === "admin" && stats && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+            {[
+              { label: "Total Companies", value: stats.totalCompanies, color: "#2C3E50" },
+              { label: "Total Applications", value: stats.totalApplications, color: "#5B8DB8" },
+              { label: "Students Selected", value: stats.totalSelected, color: "#6BAE8E" },
+              { label: "Top Company", value: stats.topCompany?.name || "—", color: "#2C3E50", sub: stats.topCompany ? `${stats.topCompany.selectedCount} selected` : null },
+            ].map(s => (
+              <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E4E2DC", borderRadius: 14, padding: 18, boxShadow: "0 1px 4px rgba(44,62,80,0.06)" }}>
+                <p style={{ fontSize: 11, color: "#8A94A0", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6, margin: "0 0 6px" }}>{s.label}</p>
+                <p style={{ fontSize: typeof s.value === "number" ? 26 : 15, fontWeight: 600, color: s.color, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</p>
+                {s.sub && <p style={{ fontSize: 12, color: "#8A94A0", margin: "2px 0 0" }}>{s.sub}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Filter row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+          <div style={{ position: "relative" }}>
+            <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#8A94A0", pointerEvents: "none" }} />
+            <input type="text"
+              style={{ width: 280, height: 40, border: "1px solid #D8D5CE", borderRadius: 8, paddingLeft: 36, paddingRight: 12, fontSize: 14, color: "#2C3E50", background: "#FFFFFF", outline: "none", fontFamily: "inherit", transition: "all 150ms ease" }}
+              placeholder="Search companies or roles..."
+              value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+              onFocus={e => { e.target.style.borderColor = "#5B8DB8"; e.target.style.boxShadow = "0 0 0 3px rgba(91,141,184,0.12)"; }}
+              onBlur={e => { e.target.style.borderColor = "#D8D5CE"; e.target.style.boxShadow = "none"; }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {["All", "Open", "Deadline Soon"].map(tab => {
+              const active = filterTab === tab;
               return (
-                <Link
-                  key={company._id}
-                  to={`/hiresphere/company/${company._id}`}
-                  className="card bg-success/5 shadow-lg border-2 border-success/30 hover:shadow-xl transition-all hover:-translate-y-1"
-                >
-                  <div className="card-body">
-                    <h2 className="card-title text-base">{company.name}</h2>
-                    <p className="text-sm text-primary font-medium">{company.role}</p>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="text-xs text-base-content/40">
-                        Applied: {new Date(app?.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className="badge badge-success badge-sm border-0 font-medium">Applied</span>
-                    </div>
-                  </div>
-                </Link>
+                <button key={tab} onClick={() => setFilterTab(tab)}
+                  style={{ padding: "7px 16px", borderRadius: 99, fontSize: 13, fontWeight: 500, cursor: "pointer", border: active ? "1px solid #5B8DB8" : "1px solid #D8D5CE", background: active ? "#5B8DB8" : "#FFFFFF", color: active ? "#FFFFFF" : "#8A94A0", transition: "all 150ms ease" }}
+                  onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "#F0F4F8"; e.currentTarget.style.color = "#2C3E50"; } }}
+                  onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#8A94A0"; } }}>
+                  {tab}
+                </button>
               );
             })}
           </div>
         </div>
-      )}
 
-      {/* ─── Company Listings ─── */}
-      <div>
-        {user?.role === "student" && appliedCompanies.length > 0 && (
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <svg className="w-5 h-5 text-base-content/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-            Open Companies ({openCompanies.length})
-          </h2>
-        )}
-
-        {(user?.role === "student" ? openCompanies : companies).length === 0 ? (
-          <div className="alert alert-info">
-            <span>
-              {user?.role === "admin"
-                ? "No companies listed yet. Add some!"
-                : appliedCompanies.length > 0
-                ? "You've applied to all available companies!"
-                : "No companies listed yet. Check back later."}
-            </span>
+        {/* Cards */}
+        {filteredCompanies.length === 0 ? (
+          <div style={{ background: "#FFFFFF", border: "1px solid #E4E2DC", borderRadius: 14, padding: 40, textAlign: "center", color: "#8A94A0" }}>
+            No opportunities found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(user?.role === "student" ? openCompanies : companies).map((company) => {
-              const isExpired = new Date(company.lastDate) < new Date();
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 18 }}>
+            {filteredCompanies.map(company => {
+              const expired = new Date(company.lastDate) < new Date();
+              const days = (new Date(company.lastDate) - new Date()) / 86400000;
+              const soon = days >= 0 && days <= 7 && !expired;
+              const applied = user?.role === "student" && hasApplied(company._id);
               return (
-                <Link
-                  key={company._id}
-                  to={`/hiresphere/company/${company._id}`}
-                  className="card bg-base-100 shadow-lg border border-base-300 hover:shadow-xl transition-all hover:-translate-y-1"
+                <Link key={company._id} to={`/hiresphere/company/${company._id}`}
+                  style={{
+                    display: "flex", flexDirection: "column", background: "#FFFFFF",
+                    border: "1px solid #E4E2DC",
+                    borderLeft: soon ? "3px solid #B89B6B" : "1px solid #E4E2DC",
+                    borderRadius: 14, padding: 20, textDecoration: "none",
+                    boxShadow: "0 1px 4px rgba(44,62,80,0.06)", transition: "all 150ms ease",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(44,62,80,0.10)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(44,62,80,0.06)"; e.currentTarget.style.transform = "none"; }}
                 >
-                  <div className="card-body">
-                    <h2 className="card-title text-base">{company.name}</h2>
-                    <p className="text-sm text-primary font-medium">{company.role}</p>
-                    <p className="text-sm text-base-content/60 line-clamp-2">{company.description}</p>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="text-xs text-base-content/40">
-                        Deadline: {new Date(company.lastDate).toLocaleDateString()}
-                      </span>
-                      <span className={`badge badge-sm ${isExpired ? "badge-error" : "badge-success"}`}>
-                        {isExpired ? "Closed" : "Open"}
-                      </span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#2C3E50", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "70%" }}>{company.name}</span>
+                    <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: expired ? "#FBF0F0" : "#EDF7F2", color: expired ? "#C17B7B" : "#3D7A62" }}>
+                      {expired ? "Closed" : "Open"}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: "#5B8DB8", marginBottom: 10 }}>{company.role}</div>
+                  <p style={{ fontSize: 13, color: "#8A94A0", lineHeight: 1.6, flexGrow: 1, margin: "0 0 14px", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>
+                    {company.description}
+                  </p>
+                  <div style={{ height: 1, background: "#E4E2DC", margin: "0 0 14px" }} />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, color: soon ? "#B89B6B" : "#8A94A0" }}>
+                      <Calendar size={13} />
+                      <span style={{ fontSize: 12 }}>{new Date(company.lastDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
                     </div>
+                    {user?.role === "student" ? (
+                      <span style={{ fontSize: 13, fontWeight: 500, padding: "4px 12px", borderRadius: 8, border: applied ? "1px solid #6BAE8E" : "1px solid #C8CDD5", color: applied ? "#3D7A62" : "#8A94A0", background: applied ? "#EDF7F2" : "transparent" }}>
+                        {applied ? "Applied" : "Apply"}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 13, fontWeight: 500, color: "#5B8DB8" }}>View</span>
+                    )}
                   </div>
                 </Link>
               );

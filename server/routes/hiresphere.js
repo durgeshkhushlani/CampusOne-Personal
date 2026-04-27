@@ -20,5 +20,10 @@ router.get("/applications/student", requireRole("student"), applicationCtrl.getS
 router.get("/applications/company/:companyId", requireRole("admin"), applicationCtrl.getApplicationsByCompany);
 router.get("/applications/company/:companyId/download", requireRole("admin"), applicationCtrl.downloadResumes);
 router.get("/applications/company/:companyId/export", requireRole("admin"), applicationCtrl.exportApplicationsExcel);
+router.put("/applications/:applicationId/status", requireRole("admin"), applicationCtrl.updateApplicationStatus);
+router.delete("/applications/:applicationId", requireRole("student"), applicationCtrl.withdrawApplication);
+
+// Stats route
+router.get("/stats", requireRole("admin"), applicationCtrl.getPlacementStats);
 
 module.exports = router;

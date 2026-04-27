@@ -30,6 +30,8 @@ const companySchema = new mongoose.Schema(
       enum: ["file", "link"],
       default: "file"
     },
+    minCGPA: { type: Number, default: 0 },
+    eligibleBranches: [{ type: String }],
     createdByAdmin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

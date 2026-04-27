@@ -49,7 +49,15 @@ const createAnnouncement = async (req, res) => {
 // GET /api/erp/admin/announcements
 const getAnnouncements = async (req, res) => {
   try {
-    const announcements = await Announcement.find()
+    let filter = {};
+    if (req.user.role === "student") {
+      filter.targetAudience = { $in: ["all", "students"] };
+    } else if (req.user.role === "faculty") {
+      filter.targetAudience = { $in: ["all", "faculty"] };
+    }
+    // admin sees all — no filter
+
+    const announcements = await Announcement.find(filter)
       .populate("author", "name email")
       .sort({ createdAt: -1 });
     res.json({ success: true, data: announcements });

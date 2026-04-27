@@ -1,9 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
 @import "tailwindcss";
 @plugin "daisyui";
 
 @layer base {
   body {
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    @apply bg-base-200 text-base-content;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    background-color: #FAF5E6;
+    color: #5C4033;
+    font-size: 14px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'DM Mono', 'Fira Code', monospace;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+@layer utilities {
+  .transition-warm {
+    transition: all 150ms ease;
+  }
+
+  .card-warm {
+    background: #FFFFFF;
+    border: 1px solid #E8DCC4;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(92, 64, 51, 0.06);
+    transition: all 150ms ease;
+  }
+
+  .card-warm:hover {
+    box-shadow: 0 4px 16px rgba(92, 64, 51, 0.10);
+    transform: translateY(-2px);
+    border-color: #8C2E2E;
   }
 }

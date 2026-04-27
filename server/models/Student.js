@@ -21,6 +21,7 @@ const studentSchema = new mongoose.Schema(
     address: { type: String },
     guardianName: { type: String },
     guardianPhone: { type: String },
+    bloodGroup: { type: String },
   },
   { timestamps: true }
 );

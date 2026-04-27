@@ -32,15 +32,15 @@ const Company = require("./models/Company");
 
 // 50 Students — email = firstname.lastname@campusone.com, password = firstname@DDMMYYYY#
 const STUDENT_NAMES = [
-  { first: "Aarav", last: "Patel", dob: new Date(2004, 2, 15) },       // 15-03-2004
-  { first: "Diya", last: "Sharma", dob: new Date(2004, 6, 22) },       // 22-07-2004
-  { first: "Vivaan", last: "Gupta", dob: new Date(2003, 11, 8) },      // 08-12-2003
-  { first: "Ananya", last: "Iyer", dob: new Date(2004, 0, 30) },       // 30-01-2004
-  { first: "Rohit", last: "Mehra", dob: new Date(2003, 8, 12) },       // 12-09-2003
-  { first: "Ishaan", last: "Reddy", dob: new Date(2004, 3, 5) },       // 05-04-2004
-  { first: "Priya", last: "Nair", dob: new Date(2004, 5, 18) },        // 18-06-2004
-  { first: "Arjun", last: "Singh", dob: new Date(2003, 10, 25) },      // 25-11-2003
-  { first: "Kavya", last: "Desai", dob: new Date(2004, 1, 14) },       // 14-02-2004
+  { first: "Durgesh", last: "Khushlani", dob: new Date(2004, 2, 15) },       // 15-03-2004
+  { first: "Jay", last: "Unadkat", dob: new Date(2004, 6, 22) },         // 22-07-2004
+  { first: "Moksh", last: "Mehta", dob: new Date(2003, 11, 8) },         // 08-12-2003
+  { first: "Priyanshu", last: "Dhrangdhariya", dob: new Date(2004, 0, 30) }, // 30-01-2004
+  { first: "Rohit", last: "Mehra", dob: new Date(2003, 8, 12) },         // 12-09-2003
+  { first: "Ishaan", last: "Reddy", dob: new Date(2004, 3, 5) },         // 05-04-2004
+  { first: "Priya", last: "Nair", dob: new Date(2004, 5, 18) },          // 18-06-2004
+  { first: "Arjun", last: "Singh", dob: new Date(2003, 10, 25) },        // 25-11-2003
+  { first: "Kavya", last: "Desai", dob: new Date(2004, 1, 14) },         // 14-02-2004
   { first: "Reyansh", last: "Kumar", dob: new Date(2003, 7, 3) },      // 03-08-2003
   { first: "Saanvi", last: "Choudhary", dob: new Date(2004, 4, 9) },   // 09-05-2004
   { first: "Aditya", last: "Joshi", dob: new Date(2003, 9, 20) },      // 20-10-2003
@@ -128,74 +128,85 @@ const COMPANIES = [
   {
     name: "Tata Consultancy Services (TCS)",
     role: "Software Developer",
-    description: "TCS is hiring B.Tech graduates for the role of Software Developer. You will work on enterprise-scale projects using Java, Spring Boot, and cloud technologies. The role involves full SDLC participation from design to deployment.\n\nPackage: ₹7.0 LPA | Location: Mumbai, Pune, Hyderabad\nEligibility: B.Tech CS/IT, CGPA ≥ 7.0, No active backlogs",
+    description: "TCS is hiring graduates for the role of Software Developer. You will work on enterprise-scale projects using Java, Spring Boot, and cloud technologies. The role involves full SDLC participation from design to deployment.\n\nPackage: ₹7.0 LPA | Location: Mumbai, Pune, Hyderabad",
     lastDate: new Date(2026, 4, 15),
-    formQuestions: ["What is your CGPA?", "Why do you want to join TCS?", "Are you open to relocation?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Infosys",
     role: "Systems Engineer",
-    description: "Infosys is looking for Systems Engineers to join their Mysuru campus for a 6-month training followed by project allocation. You'll work on cutting-edge digital transformation projects for global clients.\n\nPackage: ₹6.5 LPA | Location: Mysuru, Bengaluru, Pune\nEligibility: B.Tech CS/IT, CGPA ≥ 6.5, No active backlogs",
+    description: "Infosys is looking for Systems Engineers to join their Mysuru campus for a 6-month training followed by project allocation. You'll work on cutting-edge digital transformation projects for global clients.\n\nPackage: ₹6.5 LPA | Location: Mysuru, Bengaluru, Pune",
     lastDate: new Date(2026, 4, 20),
-    formQuestions: ["What is your CGPA?", "Describe a project you worked on.", "Which programming languages are you proficient in?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Wipro",
     role: "Project Engineer",
-    description: "Wipro is hiring Project Engineers for their Digital & Technology division. The role involves software development, testing, and client communication. Technologies include .NET, Java, Python, and AWS.\n\nPackage: ₹6.0 LPA | Location: Bengaluru, Chennai, Hyderabad\nEligibility: B.Tech CS/IT, CGPA ≥ 6.0",
+    description: "Wipro is hiring Project Engineers for their Digital & Technology division. The role involves software development, testing, and client communication. Technologies include .NET, Java, Python, and AWS.\n\nPackage: ₹6.0 LPA | Location: Bengaluru, Chennai, Hyderabad",
     lastDate: new Date(2026, 4, 25),
-    formQuestions: ["What is your CGPA?", "Tell us about your final year project.", "Are you willing to work in shifts?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Google India",
     role: "Software Engineering Intern (SWE Intern)",
-    description: "Google is offering a 12-week summer internship for outstanding B.Tech students. You'll work on real Google products used by billions of users. Strong DSA and problem-solving skills are required.\n\nStipend: ₹1.5L/month | Location: Bengaluru, Hyderabad\nEligibility: B.Tech CS/IT (Pre-final year), CGPA ≥ 8.5",
+    description: "Google is offering a 12-week summer internship for outstanding students. You'll work on real Google products used by billions of users. Strong DSA and problem-solving skills are required.\n\nStipend: ₹1.5L/month | Location: Bengaluru, Hyderabad",
     lastDate: new Date(2026, 5, 1),
-    formQuestions: ["What is your CGPA?", "Link to your GitHub/LeetCode profile?", "Describe your most challenging technical problem."],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Microsoft India",
     role: "Software Engineer (Full-Time)",
-    description: "Microsoft is hiring new graduates for SDE roles across Azure, Office 365, and Teams. You'll build scalable cloud services and user-facing features. Strong CS fundamentals and coding skills required.\n\nPackage: ₹19.0 LPA | Location: Hyderabad, Bengaluru\nEligibility: B.Tech CS/IT, CGPA ≥ 8.0, No backlogs",
+    description: "Microsoft is hiring new graduates for SDE roles across Azure, Office 365, and Teams. You'll build scalable cloud services and user-facing features. Strong CS fundamentals and coding skills required.\n\nPackage: ₹19.0 LPA | Location: Hyderabad, Bengaluru",
     lastDate: new Date(2026, 5, 5),
-    formQuestions: ["What is your CGPA?", "Describe a system design you've worked on.", "Which Microsoft product would you like to improve and how?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Amazon India",
     role: "SDE-1 (Software Development Engineer)",
-    description: "Amazon is hiring SDE-1 engineers for their Hyderabad and Bengaluru offices. You'll work on Amazon's retail, AWS, or Alexa platforms. The role requires expertise in data structures, algorithms, and system design.\n\nPackage: ₹16.0 LPA + stocks | Location: Hyderabad, Bengaluru\nEligibility: B.Tech CS/IT, CGPA ≥ 7.5",
+    description: "Amazon is hiring SDE-1 engineers for their Hyderabad and Bengaluru offices. You'll work on Amazon's retail, AWS, or Alexa platforms. The role requires expertise in data structures, algorithms, and system design.\n\nPackage: ₹16.0 LPA + stocks | Location: Hyderabad, Bengaluru",
     lastDate: new Date(2026, 5, 10),
-    formQuestions: ["What is your CGPA?", "Describe your experience with cloud services.", "Tell us about a time you optimized a solution."],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Deloitte India",
     role: "Analyst — Technology Consulting",
-    description: "Deloitte is hiring Analysts for their Technology Consulting practice. The role involves digital transformation advisory, ERP implementations (SAP/Oracle), and business process optimization for Fortune 500 clients.\n\nPackage: ₹8.5 LPA | Location: Mumbai, Bengaluru, Gurugram\nEligibility: B.Tech CS/IT, CGPA ≥ 7.0",
+    description: "Deloitte is hiring Analysts for their Technology Consulting practice. The role involves digital transformation advisory, ERP implementations (SAP/Oracle), and business process optimization for Fortune 500 clients.\n\nPackage: ₹8.5 LPA | Location: Mumbai, Bengaluru, Gurugram",
     lastDate: new Date(2026, 5, 15),
-    formQuestions: ["What is your CGPA?", "Why consulting?", "Describe a team project where you took a leadership role."],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Zoho Corporation",
     role: "Member Technical Staff",
-    description: "Zoho is hiring Member Technical Staff for their Chennai R&D center. You'll build features for Zoho's suite of 50+ business applications. Zoho values problem-solving over frameworks — expect a rigorous coding test.\n\nPackage: ₹8.0 LPA | Location: Chennai\nEligibility: B.Tech CS/IT, No CGPA cutoff (skill-based hiring)",
+    description: "Zoho is hiring Member Technical Staff for their Chennai R&D center. You'll build features for Zoho's suite of 50+ business applications. Zoho values problem-solving over frameworks — expect a rigorous coding test.\n\nPackage: ₹8.0 LPA | Location: Chennai",
     lastDate: new Date(2026, 5, 20),
-    formQuestions: ["Why do you want to join Zoho?", "What is your strongest programming language?", "Have you built any personal projects?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Accenture India",
     role: "Associate Software Engineer",
-    description: "Accenture is hiring Associate Software Engineers for their Advanced Technology Centers. You'll work on full-stack development, cloud migration, and AI/ML projects for global enterprises.\n\nPackage: ₹6.5 LPA | Location: Bengaluru, Pune, Hyderabad, Chennai\nEligibility: B.Tech CS/IT, CGPA ≥ 6.5",
+    description: "Accenture is hiring Associate Software Engineers for their Advanced Technology Centers. You'll work on full-stack development, cloud migration, and AI/ML projects for global enterprises.\n\nPackage: ₹6.5 LPA | Location: Bengaluru, Pune, Hyderabad, Chennai",
     lastDate: new Date(2026, 5, 25),
-    formQuestions: ["What is your CGPA?", "Which technologies are you familiar with?", "Are you open to working on-site at client locations?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
   {
     name: "Flipkart",
     role: "SDE-1 (Backend Engineer)",
-    description: "Flipkart is looking for backend engineers to work on India's largest e-commerce platform. You'll build scalable microservices handling millions of transactions daily using Java, Kafka, and distributed systems.\n\nPackage: ₹17.5 LPA + stocks | Location: Bengaluru\nEligibility: B.Tech CS/IT, CGPA ≥ 8.0, Strong DSA skills",
+    description: "Flipkart is looking for backend engineers to work on India's largest e-commerce platform. You'll build scalable microservices handling millions of transactions daily using Java, Kafka, and distributed systems.\n\nPackage: ₹17.5 LPA + stocks | Location: Bengaluru",
     lastDate: new Date(2026, 5, 30),
-    formQuestions: ["What is your CGPA?", "Describe your experience with backend technologies.", "How would you design a URL shortening service?"],
+    resumeType: "link",
+    formQuestions: ["What is your CGPA?"],
   },
 ];
+
 
 // ════════════════════════════════════════════
 // Helper Functions
@@ -374,22 +385,27 @@ async function seedERP() {
 
     for (let i = 0; i < STUDENT_NAMES.length; i++) {
       const s = STUDENT_NAMES[i];
-      const isCS = i < 25;
-      const semester = i < 15 ? 4 : i < 30 ? 3 : i < 40 ? 5 : 4;
+      const isMsc = i < 25;
+      const semester = 2; // Assuming batch started in 2025
+      
+      const department = isMsc ? "Information Technology" : "Information and Communication Technology";
+      const program = isMsc ? "M.Sc(IT)" : "B.Tech (ICT)";
+      const batch = isMsc ? "2025-27" : "2025-29";
+      
+      const enrollPrefix = isMsc ? "202512" : "202511";
+      const enrollNumber = enrollPrefix + String(51 + (isMsc ? i : i - 25)).padStart(3, "0");
 
       const doc = await Student.create({
         userId: studentUsers[i]._id,
         firstName: s.first,
         lastName: s.last,
-        enrollmentNo: `EN${isCS ? "CS" : "IT"}${String(i + 1).padStart(3, "0")}`,
-        department: isCS ? "Computer Science" : "Information Technology",
-        program: isCS ? "B.Tech Computer Science" : "B.Tech Information Technology",
+        enrollmentNo: enrollNumber,
+        department: department,
+        program: program,
         semester,
-        batch: semester <= 4 ? "2023-27" : "2024-28",
+        batch: batch,
         dateOfBirth: s.dob,
-        gender: ["Diya", "Ananya", "Priya", "Kavya", "Saanvi", "Meera", "Tanya", "Riya", "Nisha",
-          "Siya", "Pooja", "Sneha", "Aisha", "Neha", "Avni", "Tanvi", "Myra", "Kiara", "Zara",
-          "Ira", "Navya", "Trisha", "Aditi", "Mansi"].includes(s.first) ? "female" : "male",
+        gender: ["Priyanshu", "Jay", "Moksh", "Durgesh", "Rohit", "Ishaan", "Arjun", "Reyansh", "Aditya", "Vihaan", "Kabir", "Dhruv", "Arnav", "Yash", "Dev", "Krish", "Shaurya", "Parth", "Laksh", "Rudra", "Atharv", "Advait", "Siddharth", "Harsh", "Om", "Kartik", "Raghav", "Varun"].includes(s.first) ? "male" : "female",
         phone: randomPhone(),
         address: `${randomInt(1, 999)}, ${randomFrom(["Sector", "Block", "Wing"])} ${randomFrom(["A", "B", "C", "D"])}, ${randomFrom(["Mumbai", "Delhi", "Bangalore", "Pune", "Hyderabad", "Chennai", "Ahmedabad", "Jaipur"])}`,
         guardianName: `${randomFrom(["Mr.", "Mrs."])} ${randomFrom(["Patel", "Sharma", "Gupta", "Singh", "Kumar", "Verma", "Reddy", "Nair", "Iyer", "Joshi"])}`,

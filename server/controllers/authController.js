@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Student = require("../models/Student");
+const Faculty = require("../models/Faculty");
 const jwt = require("jsonwebtoken");
 
 /**
@@ -42,6 +44,26 @@ const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    // Fetch profile specific data
+    let profile = {};
+    if (user.role === "student") {
+      const student = await Student.findOne({ userId: user._id });
+      if (student) {
+        profile = {
+          semester: student.semester,
+          department: student.department,
+          program: student.program,
+        };
+      }
+    } else if (user.role === "faculty") {
+      const faculty = await Faculty.findOne({ userId: user._id });
+      if (faculty) {
+        profile = {
+          department: faculty.department,
+        };
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Login successful.",
@@ -51,6 +73,7 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        ...profile
       },
     });
   } catch (error) {
@@ -78,6 +101,26 @@ const getMe = async (req, res) => {
       });
     }
 
+    // Fetch profile specific data
+    let profile = {};
+    if (user.role === "student") {
+      const student = await Student.findOne({ userId: user._id });
+      if (student) {
+        profile = {
+          semester: student.semester,
+          department: student.department,
+          program: student.program,
+        };
+      }
+    } else if (user.role === "faculty") {
+      const faculty = await Faculty.findOne({ userId: user._id });
+      if (faculty) {
+        profile = {
+          department: faculty.department,
+        };
+      }
+    }
+
     res.status(200).json({
       success: true,
       user: {
@@ -85,6 +128,7 @@ const getMe = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        ...profile
       },
     });
   } catch (error) {

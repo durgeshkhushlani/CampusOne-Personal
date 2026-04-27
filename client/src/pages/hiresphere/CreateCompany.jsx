@@ -4,14 +4,20 @@ import api from "../../utils/api";
 
 export default function CreateCompany() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: [""], resumeType: "file" });
+  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: ["What is your CGPA?"], resumeType: "link", minCGPA: "", eligibleBranches: "" });
   const [creating, setCreating] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setCreating(true);
     try {
-      await api.post("/hiresphere/companies", { ...form, formQuestions: form.formQuestions.filter(Boolean) });
+      const payload = {
+        ...form,
+        formQuestions: form.formQuestions.filter(Boolean),
+        minCGPA: form.minCGPA ? Number(form.minCGPA) : 0,
+        eligibleBranches: form.eligibleBranches ? form.eligibleBranches.split(",").map(b => b.trim()).filter(Boolean) : [],
+      };
+      await api.post("/hiresphere/companies", payload);
       navigate("/hiresphere");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to create company");
@@ -53,6 +59,21 @@ export default function CreateCompany() {
                 <span className="label-text">Google Drive Link</span>
               </label>
             </label>
+          </div>
+
+          {/* Eligibility Criteria */}
+          <div className="border-y border-base-200 py-4 space-y-3">
+            <p className="text-sm font-medium text-base-content/80">Eligibility Criteria (optional)</p>
+            <div className="flex gap-4">
+              <div className="form-control flex-1">
+                <label className="label"><span className="label-text">Minimum CGPA (0–10)</span></label>
+                <input type="number" className="input input-bordered w-full" placeholder="e.g. 7.0" min="0" max="10" step="0.1" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: e.target.value })} />
+              </div>
+              <div className="form-control flex-1">
+                <label className="label"><span className="label-text">Eligible Branches (comma-separated)</span></label>
+                <input className="input input-bordered w-full" placeholder="e.g. CSE, IT, ECE" value={form.eligibleBranches} onChange={(e) => setForm({ ...form, eligibleBranches: e.target.value })} />
+              </div>
+            </div>
           </div>
 
           <div>

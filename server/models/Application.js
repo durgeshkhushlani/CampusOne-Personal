@@ -22,6 +22,11 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Resume is required"],
     },
+    status: {
+      type: String,
+      enum: ["applied", "shortlisted", "rejected", "selected"],
+      default: "applied",
+    },
   },
   { timestamps: true }
 );
