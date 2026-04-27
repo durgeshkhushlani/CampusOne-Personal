@@ -36,8 +36,9 @@ router.delete("/classrooms/:id", requireRole("admin"), classroomCtrl.deleteClass
 // Post Routes
 // ========================
 router.post("/posts", requireRole("faculty", "admin"), upload.single("file"), postCtrl.createPost);
-router.get("/posts/:classroom_id", requireRole("student", "faculty", "admin"), postCtrl.getPostsByClassroom);
 router.get("/posts/post/:post_id", requireRole("student", "faculty", "admin"), postCtrl.getPostById);
+router.get("/posts/:classroom_id", requireRole("student", "faculty", "admin"), postCtrl.getPostsByClassroom);
+
 router.post("/posts/:post_id/submit", requireRole("student"), upload.single("file"), postCtrl.submitAssignment);
 router.delete("/posts/:post_id/submit", requireRole("student"), postCtrl.unsubmitAssignment);
 router.get("/posts/:post_id/my-submission", requireRole("student"), postCtrl.getMySubmission);
