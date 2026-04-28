@@ -13,6 +13,15 @@ const inputStyle = {
   fontFamily: "inherit", transition: "all 150ms ease",
 };
 
+const Modal = ({ title, onClose, children }) => (
+  <div style={{ position: "fixed", inset: 0, background: "rgba(44,62,80,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
+    <div style={{ background: "#FFFFFF", borderRadius: 14, padding: 28, width: "100%", maxWidth: 440, boxShadow: "0 8px 32px rgba(44,62,80,0.16)" }}>
+      <h3 style={{ fontSize: 17, fontWeight: 600, color: "#2C3E50", marginBottom: 20 }}>{title}</h3>
+      {children}
+    </div>
+  </div>
+);
+
 export default function ClassroomDashboard() {
   const { user } = useAuth();
   const [classrooms, setClassrooms] = useState([]);
@@ -57,15 +66,6 @@ export default function ClassroomDashboard() {
   };
 
   if (loading) return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh", background: "#F7F6F2" }}><span className="loading loading-spinner loading-lg" style={{ color: "#5B8DB8" }}></span></div>;
-
-  const Modal = ({ title, onClose, children }) => (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(44,62,80,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }}>
-      <div style={{ background: "#FFFFFF", borderRadius: 14, padding: 28, width: "100%", maxWidth: 440, boxShadow: "0 8px 32px rgba(44,62,80,0.16)" }}>
-        <h3 style={{ fontSize: 17, fontWeight: 600, color: "#2C3E50", marginBottom: 20 }}>{title}</h3>
-        {children}
-      </div>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#F7F6F2", padding: "32px 16px" }}>

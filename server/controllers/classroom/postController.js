@@ -249,6 +249,29 @@ const unsubmitAssignment = async (req, res) => {
   }
 };
 
+// DELETE /api/classroom/posts/:post_id
+const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    // Check authorization: only post author or admin can delete
+    if (post.authorId.toString() !== req.user.userId.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    // Delete related submissions and comments
+    await ClassroomSubmission.deleteMany({ postId: post._id });
+    await Comment.deleteMany({ postId: post._id });
+
+    await post.deleteOne();
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Delete post error:", error);
+    res.status(500).json({ error: "Failed to delete post" });
+  }
+};
+
 module.exports = {
   createPost,
   getPostsByClassroom,
@@ -262,4 +285,5 @@ module.exports = {
   addComment,
   getMyGrades,
   togglePinPost,
+  deletePost,
 };

@@ -29,7 +29,7 @@ export default function AssignmentDetail() {
       setLoading(true);
       const [postRes, subRes] = await Promise.all([
         api.get(`/classroom/posts/post/${postId}`),
-        api.get(`/classroom/posts/${postId}/my-submission`)
+        user?.role === "student" ? api.get(`/classroom/posts/${postId}/my-submission`) : Promise.resolve({ data: null })
       ]);
       setPost(postRes.data);
       setSubmission(subRes.data);

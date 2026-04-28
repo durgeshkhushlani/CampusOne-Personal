@@ -121,6 +121,16 @@ export default function ClassroomDetail() {
     }
   };
 
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm("Delete this post? This removes all attachments and submissions.")) return;
+    try {
+      await api.delete(`/classroom/posts/${postId}`);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to delete post");
+    }
+  };
+
   const toggleTopicCollapse = (topic) => {
     setCollapsedTopics((prev) => ({ ...prev, [topic]: !prev[topic] }));
   };
@@ -407,13 +417,22 @@ export default function ClassroomDetail() {
                               <div className="flex items-center gap-2">
                                 {/* Pin/Unpin button — Faculty only */}
                                 {(user?.role === "faculty" || user?.role === "admin") && (
-                                  <button
-                                    onClick={() => handleTogglePin(post._id)}
-                                    className={`btn btn-xs ${post.isPinned ? "btn-warning" : "btn-ghost"}`}
-                                    title={post.isPinned ? "Unpin" : "Pin"}
-                                  >
-                                    📌 {post.isPinned ? "Unpin" : "Pin"}
-                                  </button>
+                                  <>
+                                    <button
+                                      onClick={() => handleTogglePin(post._id)}
+                                      className={`btn btn-xs ${post.isPinned ? "btn-warning" : "btn-ghost"}`}
+                                      title={post.isPinned ? "Unpin" : "Pin"}
+                                    >
+                                      📌 {post.isPinned ? "Unpin" : "Pin"}
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeletePost(post._id)}
+                                      className="btn btn-xs btn-ghost text-error"
+                                      title="Delete Post"
+                                    >
+                                      🗑 Delete
+                                    </button>
+                                  </>
                                 )}
 
                                 {post.type === "assignment" && user?.role === "student" && (
