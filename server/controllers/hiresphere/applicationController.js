@@ -58,10 +58,18 @@ const submitApplication = async (req, res) => {
     }
 
     let resumePath = "";
-    if (req.file) {
-      resumePath = req.file.filename;
+    if (company.resumeType === "link") {
+      const { resume } = req.body;
+      if (!resume || !resume.trim()) {
+        return res.status(400).json({ message: "Please provide your resume link" });
+      }
+      resumePath = resume.trim();
     } else {
-      return res.status(400).json({ message: "Please upload a resume" });
+      if (req.file) {
+        resumePath = req.file.filename;
+      } else {
+        return res.status(400).json({ message: "Please upload your resume" });
+      }
     }
 
     const parsedAnswers = typeof answers === "string" ? JSON.parse(answers) : answers;
