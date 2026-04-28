@@ -6,6 +6,7 @@ const path = require("path");
 const fs = require("fs");
 const XLSX = require("xlsx");
 const { uploadToCloudinary } = require("../../utils/cloudinary");
+const axios = require("axios");
 
 /**
  * Helper: Get student ERP profile from their User ID
@@ -132,7 +133,7 @@ const getApplicationsByCompany = async (req, res) => {
 // GET /api/hiresphere/applications/company/:companyId/download
 const downloadResumes = async (req, res) => {
   try {
-    const applications = await Application.find({ companyId: req.params.companyId });
+    const applications = await Application.find({ companyId: req.params.companyId }).populate("studentId", "name");
     if (applications.length === 0) return res.status(404).json({ message: "No applications found" });
 
     const company = await Company.findById(req.params.companyId);
@@ -147,9 +148,24 @@ const downloadResumes = async (req, res) => {
     const uploadsDir = path.join(__dirname, "..", "..", "uploads", "resumes");
 
     for (const app of applications) {
-      const filePath = path.join(uploadsDir, app.resume);
-      if (fs.existsSync(filePath)) {
-        archive.file(filePath, { name: app.resume });
+      if (!app.resume) continue;
+
+      if (app.resume.startsWith("http")) {
+        try {
+          const response = await axios.get(app.resume, { responseType: "stream" });
+          const studentName = app.studentId?.name || `Student_${app._id}`;
+          const safeName = studentName.replace(/\s+/g, "_");
+          const urlPath = new URL(app.resume).pathname;
+          const ext = path.extname(urlPath) || ".pdf";
+          archive.append(response.data, { name: `${safeName}_resume${ext}` });
+        } catch (err) {
+          console.error(`Failed to fetch resume from Cloudinary for application ${app._id}:`, err.message);
+        }
+      } else {
+        const filePath = path.join(uploadsDir, app.resume);
+        if (fs.existsSync(filePath)) {
+          archive.file(filePath, { name: app.resume });
+        }
       }
     }
 
