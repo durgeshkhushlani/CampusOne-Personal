@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
@@ -57,6 +57,10 @@ function GlobalControls() {
 
 function BackButton() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === "/login") return null;
+
   return (
     <button 
       onClick={() => navigate(-1)} 
