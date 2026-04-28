@@ -236,7 +236,7 @@ export default function CompanyDetail() {
                           {app.resume ? (
                             app.resume.startsWith("http") ? (
                               <a href={app.resume} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-[#5B8DB8] hover:underline text-xs font-medium">
-                                <Link2 className="w-3.5 h-3.5" /> Drive
+                                <Link2 className="w-3.5 h-3.5" /> View
                               </a>
                             ) : (
                               <a href={`/uploads/resumes/${app.resume}`} target="_blank" rel="noreferrer" className="text-[#5B8DB8] hover:underline text-xs font-medium">
@@ -296,7 +296,7 @@ export default function CompanyDetail() {
               <h3 className="font-semibold text-sm text-[#2C3E50] mb-2">Resume Submitted</h3>
               {myApplication.resume?.startsWith("http") ? (
                 <a href={myApplication.resume} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-[#5B8DB8] hover:underline text-sm font-medium">
-                  <Link2 className="w-4 h-4" /> View on Google Drive
+                  <Link2 className="w-4 h-4" /> View Resume
                 </a>
               ) : (
                 <a href={`/uploads/resumes/${myApplication.resume}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium text-[#5B8DB8] hover:underline">

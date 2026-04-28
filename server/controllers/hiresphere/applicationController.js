@@ -5,6 +5,7 @@ const archiver = require("archiver");
 const path = require("path");
 const fs = require("fs");
 const XLSX = require("xlsx");
+const { uploadToCloudinary } = require("../../utils/cloudinary");
 
 /**
  * Helper: Get student ERP profile from their User ID
@@ -76,7 +77,12 @@ const submitApplication = async (req, res) => {
       resumePath = resume.trim();
     } else {
       if (req.file) {
-        resumePath = req.file.filename;
+        const uploadRes = await uploadToCloudinary(req.file.path);
+        if (uploadRes) {
+          resumePath = uploadRes.secure_url;
+        } else {
+          return res.status(500).json({ message: "File upload failed" });
+        }
       } else {
         return res.status(400).json({ message: "Please upload your resume" });
       }

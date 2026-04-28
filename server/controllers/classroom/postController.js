@@ -3,13 +3,23 @@ const ClassroomSubmission = require("../../models/ClassroomSubmission");
 const Comment = require("../../models/Comment");
 const User = require("../../models/User");
 const Classroom = require("../../models/Classroom");
+const { uploadToCloudinary } = require("../../utils/cloudinary");
 
 // POST /api/classroom/posts
 const createPost = async (req, res) => {
   try {
     const { classroom_id, title, content, type, due_date, total_points, topic } = req.body;
-    const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    const fileName = req.file ? req.file.originalname : null;
+    
+    let fileUrl = null;
+    let fileName = null;
+
+    if (req.file) {
+      const uploadRes = await uploadToCloudinary(req.file.path);
+      if (uploadRes) {
+        fileUrl = uploadRes.secure_url;
+        fileName = req.file.originalname;
+      }
+    }
 
     const post = await Post.create({
       classroomId: classroom_id,
@@ -62,8 +72,16 @@ const getPostsByClassroom = async (req, res) => {
 // POST /api/classroom/posts/:post_id/submit
 const submitAssignment = async (req, res) => {
   try {
-    const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    const fileName = req.file ? req.file.originalname : null;
+    let fileUrl = null;
+    let fileName = null;
+    if (req.file) {
+      const uploadRes = await uploadToCloudinary(req.file.path);
+      if (uploadRes) {
+        fileUrl = uploadRes.secure_url;
+        fileName = req.file.originalname;
+      }
+    }
+    
     if (!fileUrl) return res.status(400).json({ error: "File is required" });
 
     // Check if submission is late
@@ -308,8 +326,11 @@ const updatePost = async (req, res) => {
     if (total_points !== undefined) post.totalPoints = Number(total_points) || 100;
 
     if (req.file) {
-      post.fileUrl = `/uploads/${req.file.filename}`;
-      post.fileName = req.file.originalname;
+      const uploadRes = await uploadToCloudinary(req.file.path);
+      if (uploadRes) {
+        post.fileUrl = uploadRes.secure_url;
+        post.fileName = req.file.originalname;
+      }
     }
 
     await post.save();
