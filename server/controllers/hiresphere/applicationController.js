@@ -77,7 +77,7 @@ const submitApplication = async (req, res) => {
       resumePath = resume.trim();
     } else {
       if (req.file) {
-        const uploadRes = await uploadToCloudinary(req.file.path);
+        const uploadRes = await uploadToCloudinary(req.file.path, req.file.originalname);
         if (uploadRes) {
           resumePath = uploadRes.secure_url;
         } else {

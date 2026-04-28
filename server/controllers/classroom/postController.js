@@ -14,7 +14,7 @@ const createPost = async (req, res) => {
     let fileName = null;
 
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.path);
+      const uploadRes = await uploadToCloudinary(req.file.path, req.file.originalname);
       if (uploadRes) {
         fileUrl = uploadRes.secure_url;
         fileName = req.file.originalname;
@@ -75,7 +75,7 @@ const submitAssignment = async (req, res) => {
     let fileUrl = null;
     let fileName = null;
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.path);
+      const uploadRes = await uploadToCloudinary(req.file.path, req.file.originalname);
       if (uploadRes) {
         fileUrl = uploadRes.secure_url;
         fileName = req.file.originalname;
@@ -326,7 +326,7 @@ const updatePost = async (req, res) => {
     if (total_points !== undefined) post.totalPoints = Number(total_points) || 100;
 
     if (req.file) {
-      const uploadRes = await uploadToCloudinary(req.file.path);
+      const uploadRes = await uploadToCloudinary(req.file.path, req.file.originalname);
       if (uploadRes) {
         post.fileUrl = uploadRes.secure_url;
         post.fileName = req.file.originalname;

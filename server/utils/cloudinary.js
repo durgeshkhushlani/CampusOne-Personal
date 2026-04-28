@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
+const path = require("path");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,14 +12,16 @@ cloudinary.config({
  * Uploads a file from its local path to Cloudinary (raw mode for PDFs).
  * Safely removes the local file afterward.
  */
-const uploadToCloudinary = async (filePath) => {
+const uploadToCloudinary = async (filePath, originalName) => {
   try {
     if (!filePath) return null;
 
+    const ext = originalName ? path.extname(originalName) : ".pdf";
+    const publicId = `${Date.now()}${ext}`;
+
     const result = await cloudinary.uploader.upload(filePath, {
       resource_type: "raw",
-      use_filename: true,
-      unique_filename: true,
+      public_id: publicId,
     });
 
     // Delete local file after upload
@@ -36,7 +39,13 @@ const uploadToCloudinary = async (filePath) => {
     };
   } catch (error) {
     console.error("Cloudinary upload error:", error);
-    throw new Error("File upload to Cloudinary failed.");
+    try {
+      fs.writeFileSync(
+        path.join(__dirname, "..", "cloudinary_error.log"),
+        JSON.stringify({ message: error.message, stack: error.stack, error }, null, 2)
+      );
+    } catch (e) {}
+    throw new Error("File upload to Cloudinary failed: " + error.message);
   }
 };
 
