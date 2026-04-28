@@ -2,9 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 
+const AVAILABLE_BRANCHES = [
+  { label: "Computer Science (CS/CSE)", values: ["Computer Science", "CS", "CSE"] },
+  { label: "Information Technology (IT)", values: ["Information Technology", "IT", "ICT", "MSc IT"] },
+  { label: "Electronics & Communication (ECE)", values: ["Electronics", "Communication", "ECE"] },
+  { label: "Electrical Engineering (EE)", values: ["Electrical", "EE"] },
+  { label: "Mechanical Engineering (ME)", values: ["Mechanical", "ME"] },
+  { label: "Civil Engineering (CE)", values: ["Civil", "CE"] },
+];
+
 export default function CreateCompany() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: ["What is your CGPA?"], resumeType: "link", minCGPA: "", eligibleBranches: "" });
+  const [form, setForm] = useState({ name: "", role: "", description: "", lastDate: "", formQuestions: ["What is your CGPA?"], resumeType: "link", minCGPA: "", eligibleBranches: [] });
   const [creating, setCreating] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -15,7 +24,7 @@ export default function CreateCompany() {
         ...form,
         formQuestions: form.formQuestions.filter(Boolean),
         minCGPA: form.minCGPA ? Number(form.minCGPA) : 0,
-        eligibleBranches: form.eligibleBranches ? form.eligibleBranches.split(",").map(b => b.trim()).filter(Boolean) : [],
+        eligibleBranches: form.eligibleBranches,
       };
       await api.post("/hiresphere/companies", payload);
       navigate("/hiresphere");
@@ -62,16 +71,38 @@ export default function CreateCompany() {
           </div>
 
           {/* Eligibility Criteria */}
-          <div className="border-y border-base-200 py-4 space-y-3">
+          <div className="border-y border-base-200 py-4 space-y-4">
             <p className="text-sm font-medium text-base-content/80">Eligibility Criteria (optional)</p>
-            <div className="flex gap-4">
-              <div className="form-control flex-1">
-                <label className="label"><span className="label-text">Minimum CGPA (0–10)</span></label>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="form-control flex-1 md:max-w-xs">
+                <label className="label"><span className="label-text font-semibold text-[#2C3E50]">Minimum CGPA (0–10)</span></label>
                 <input type="number" className="input input-bordered w-full" placeholder="e.g. 7.0" min="0" max="10" step="0.1" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: e.target.value })} />
               </div>
               <div className="form-control flex-1">
-                <label className="label"><span className="label-text">Eligible Branches (comma-separated)</span></label>
-                <input className="input input-bordered w-full" placeholder="e.g. CSE, IT, ECE" value={form.eligibleBranches} onChange={(e) => setForm({ ...form, eligibleBranches: e.target.value })} />
+                <label className="label"><span className="label-text font-semibold text-[#2C3E50]">Eligible Branches</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-[#E4E2DC] rounded-[8px] p-4 bg-[#F7F6F2]">
+                  {AVAILABLE_BRANCHES.map((b) => (
+                    <label key={b.label} className="flex items-center gap-2 cursor-pointer hover:bg-[#F0F4F8]/50 p-1.5 rounded-[6px] transition-colors">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-primary checkbox-sm"
+                        checked={b.values.every(val => form.eligibleBranches.includes(val))}
+                        onChange={(e) => {
+                          let updated = [...form.eligibleBranches];
+                          if (e.target.checked) {
+                            b.values.forEach(val => {
+                              if (!updated.includes(val)) updated.push(val);
+                            });
+                          } else {
+                            updated = updated.filter(val => !b.values.includes(val));
+                          }
+                          setForm({ ...form, eligibleBranches: updated });
+                        }}
+                      />
+                      <span className="text-sm text-[#2C3E50]">{b.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
