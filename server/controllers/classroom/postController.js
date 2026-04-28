@@ -2,6 +2,7 @@ const Post = require("../../models/Post");
 const ClassroomSubmission = require("../../models/ClassroomSubmission");
 const Comment = require("../../models/Comment");
 const User = require("../../models/User");
+const Classroom = require("../../models/Classroom");
 
 // POST /api/classroom/posts
 const createPost = async (req, res) => {
@@ -255,8 +256,18 @@ const deletePost = async (req, res) => {
     const post = await Post.findById(req.params.post_id);
     if (!post) return res.status(404).json({ error: "Post not found" });
 
-    // Check authorization: only post author or admin can delete
-    if (post.authorId.toString() !== req.user.userId.toString() && req.user.role !== "admin") {
+    // Fetch classroom to check if user is the assigned faculty
+    const classroom = await Classroom.findById(post.classroomId);
+    
+    // Check authorization:
+    // 1. User is the author of the post
+    // 2. User is the Faculty assigned to the classroom
+    // 3. User is an Admin
+    const isAuthor = post.authorId.toString() === req.user.userId.toString();
+    const isAssignedFaculty = classroom && classroom.facultyId && classroom.facultyId.toString() === req.user.userId.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isAuthor && !isAssignedFaculty && !isAdmin) {
       return res.status(403).json({ error: "Not authorized" });
     }
 
