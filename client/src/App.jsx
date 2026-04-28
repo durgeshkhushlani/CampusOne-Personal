@@ -6,6 +6,7 @@ import PrivateRoute from "./components/PrivateRoute";
 // Core pages
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Terms from "./pages/Terms";
 
 // ERP Module
 import ErpLanding from "./pages/erp/ErpLanding";
@@ -83,6 +84,7 @@ function AppRoutes() {
         path="/login"
         element={user ? <Navigate to="/dashboard" replace /> : <Login />}
       />
+      <Route path="/terms" element={<Terms />} />
 
       {/* Protected — Dashboard */}
       <Route

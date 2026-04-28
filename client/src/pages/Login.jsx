@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { User, Lock, Eye, EyeOff, Twitter, Linkedin, Instagram, Youtube, Facebook } from "lucide-react";
 
@@ -107,7 +107,7 @@ export default function Login() {
                 <input
                   type="text"
                   style={{ ...inputStyle, paddingLeft: 36, paddingRight: 12 }}
-                  placeholder="Enter your ID"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
@@ -165,20 +165,27 @@ export default function Login() {
           <div>
             <div style={{ fontSize: 11, color: "#A6907A", fontWeight: 500 }}>Contact Us</div>
             <div style={{ fontSize: 12, color: "#5C4033", margin: "2px 0 12px" }}>
-              info@campusone.edu &nbsp;|&nbsp; +91 99999 99999
+              info@campusone.edu &nbsp;|&nbsp; +91 79847 04174
             </div>
 
             <div style={{ fontSize: 11, color: "#A6907A", fontWeight: 500, marginBottom: 6 }}>Connect with us</div>
             <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-              <Twitter size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
-              <Linkedin size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
-              <Instagram size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
-              <Youtube size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
-              <Facebook size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              <a href="https://x.com/dauofficial_" target="_blank" rel="noopener noreferrer">
+                <Twitter size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              </a>
+              <a href="https://in.linkedin.com/school/dhirubhaiambaniuniversity/" target="_blank" rel="noopener noreferrer">
+                <Linkedin size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              </a>
+              <a href="https://www.instagram.com/daiictofficial/" target="_blank" rel="noopener noreferrer">
+                <Instagram size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              </a>
+              <a href="https://www.facebook.com/officialdau/" target="_blank" rel="noopener noreferrer">
+                <Facebook size={16} color="#8C2E2E" style={{ cursor: "pointer" }} />
+              </a>
             </div>
 
             <div style={{ fontSize: 10, color: "#A6907A", borderTop: "1px solid #E8DCC4", paddingTop: "8px" }}>
-              Terms & Policies
+              <Link to="/terms" style={{ color: "inherit", textDecoration: "underline" }}>Terms & Policies</Link>
             </div>
           </div>
 
