@@ -13,6 +13,7 @@ router.post("/companies", requireRole("admin"), companyCtrl.createCompany);
 router.get("/companies", requireRole("student", "admin"), companyCtrl.getCompanies);
 router.get("/companies/:id", requireRole("student", "admin"), companyCtrl.getCompanyById);
 router.put("/companies/:id", requireRole("admin"), companyCtrl.updateCompany);
+router.delete("/companies/:id", requireRole("admin"), companyCtrl.deleteCompany);
 
 // Application routes
 router.post("/applications", requireRole("student"), upload.single("resume"), applicationCtrl.submitApplication);

@@ -147,10 +147,35 @@ export default function HireSphereDashboard() {
                   onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(44,62,80,0.06)"; e.currentTarget.style.transform = "none"; }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#2C3E50", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "70%" }}>{company.name}</span>
-                    <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: expired ? "#FBF0F0" : "#EDF7F2", color: expired ? "#C17B7B" : "#3D7A62" }}>
-                      {expired ? "Closed" : "Open"}
-                    </span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#2C3E50", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "65%" }}>{company.name}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      {user?.role === "admin" && (
+                        <button
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (window.confirm(`Are you sure you want to delete ${company.name}?`)) {
+                              try {
+                                await api.delete(`/hiresphere/companies/${company._id}`);
+                                fetchData();
+                              } catch (err) {
+                                alert(err.response?.data?.message || "Failed to delete company");
+                              }
+                            }
+                          }}
+                          style={{
+                            background: "none", border: "none", color: "#E06A6A", cursor: "pointer",
+                            padding: "2px", display: "flex", alignItems: "center", fontSize: "14px"
+                          }}
+                          title="Delete Company"
+                        >
+                          🗑️
+                        </button>
+                      )}
+                      <span style={{ fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: expired ? "#FBF0F0" : "#EDF7F2", color: expired ? "#C17B7B" : "#3D7A62" }}>
+                        {expired ? "Closed" : "Open"}
+                      </span>
+                    </div>
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 500, color: "#5B8DB8", marginBottom: 10 }}>{company.role}</div>
                   <p style={{ fontSize: 13, color: "#8A94A0", lineHeight: 1.6, flexGrow: 1, margin: "0 0 14px", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>

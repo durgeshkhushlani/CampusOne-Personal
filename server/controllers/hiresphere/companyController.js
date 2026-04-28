@@ -75,4 +75,21 @@ const updateCompany = async (req, res) => {
   }
 };
 
-module.exports = { createCompany, getCompanies, getCompanyById, updateCompany };
+// DELETE /api/hiresphere/companies/:id
+const deleteCompany = async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.id);
+    if (!company) return res.status(404).json({ message: "Company not found" });
+
+    const Application = require("../../models/Application");
+    await Application.deleteMany({ companyId: req.params.id });
+
+    await Company.findByIdAndDelete(req.params.id);
+    res.json({ message: "Company deleted successfully" });
+  } catch (error) {
+    console.error("Delete company error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { createCompany, getCompanies, getCompanyById, updateCompany, deleteCompany };
