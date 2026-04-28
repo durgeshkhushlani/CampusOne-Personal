@@ -95,14 +95,13 @@ const getApplicationsByCompany = async (req, res) => {
       .populate("studentId", "name email")
       .sort({ createdAt: -1 });
 
-    // Enrich each application with ERP data (enrollmentNo) and CGPA from answers
+    // Enrich each application with ERP data (enrollmentNo)
     const enriched = await Promise.all(
       applications.map(async (app) => {
         const appObj = app.toObject();
         const profile = await getStudentProfile(app.studentId?._id);
         appObj.enrollmentNo = profile?.enrollmentNo || "N/A";
         appObj.department = profile?.department || "N/A";
-        appObj.cgpa = extractCGPA(app.answers);
         return appObj;
       })
     );
@@ -155,7 +154,6 @@ const exportApplicationsExcel = async (req, res) => {
     const company = await Company.findById(req.params.companyId);
     if (!company) return res.status(404).json({ message: "Company not found" });
 
-    // Build rows with ERP data + CGPA from answers
     const rows = await Promise.all(
       applications.map(async (app, idx) => {
         const profile = await getStudentProfile(app.studentId?._id);
@@ -167,7 +165,6 @@ const exportApplicationsExcel = async (req, res) => {
           "Enrollment No": profile?.enrollmentNo || "N/A",
           "Department": profile?.department || "N/A",
           "Semester": profile?.semester || "N/A",
-          "CGPA": extractCGPA(app.answers),
           "Applied On": new Date(app.createdAt).toLocaleDateString("en-IN"),
         };
 
@@ -186,11 +183,9 @@ const exportApplicationsExcel = async (req, res) => {
       return res.status(404).json({ message: "No applications to export" });
     }
 
-    // Create workbook
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows);
 
-    // Auto-size columns
     const colWidths = Object.keys(rows[0] || {}).map((key) => ({
       wch: Math.max(key.length, ...rows.map((r) => String(r[key] || "").length)) + 2,
     }));
@@ -198,7 +193,6 @@ const exportApplicationsExcel = async (req, res) => {
 
     XLSX.utils.book_append_sheet(wb, ws, "Applications");
 
-    // Write to buffer and send
     const buf = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
     const fileName = `${company.name.replace(/\s+/g, "_")}_applications.xlsx`;
 
@@ -275,7 +269,6 @@ async function getPlacementStats(req, res) {
     const totalApplications = await Application.countDocuments();
     const totalSelected = await Application.countDocuments({ status: "selected" });
 
-    // Top company: company with most selected students
     const topCompanyAgg = await Application.aggregate([
       { $match: { status: "selected" } },
       { $group: { _id: "$companyId", count: { $sum: 1 } } },

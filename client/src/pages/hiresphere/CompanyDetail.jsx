@@ -204,7 +204,6 @@ export default function CompanyDetail() {
                       <th className="pb-3 text-left pl-2">#</th>
                       <th className="pb-3 text-left">Student</th>
                       <th className="pb-3 text-left">Enrollment</th>
-                      <th className="pb-3 text-left">CGPA</th>
                       <th className="pb-3 text-left">Applied On</th>
                       <th className="pb-3 text-left">Status</th>
                       <th className="pb-3 text-left">Resume</th>
@@ -220,7 +219,6 @@ export default function CompanyDetail() {
                           <div className="text-xs text-[#8A94A0]">{app.studentId?.email || ""}</div>
                         </td>
                         <td className="py-3 font-mono text-[#8A94A0] text-xs">{app.enrollmentNo || "N/A"}</td>
-                        <td className="py-3 font-semibold text-[#2C3E50]">{app.cgpa || "N/A"}</td>
                         <td className="py-3 text-[#8A94A0]">{new Date(app.createdAt).toLocaleDateString()}</td>
                         <td className="py-3">
                           <select
