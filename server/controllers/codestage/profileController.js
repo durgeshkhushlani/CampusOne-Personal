@@ -66,23 +66,24 @@ const getLeaderboard = async (req, res) => {
       { $group: { _id: { userId: "$userId", problemId: "$problemId" } } },
       { $group: { _id: "$_id.userId", solvedCount: { $sum: 1 } } },
       { $sort: { solvedCount: -1 } },
-      { $limit: 20 },
+      { $limit: 50 },
     ]);
 
-    // Populate user names
-    const leaderboard = await Promise.all(
-      results.map(async (entry, idx) => {
-        const user = await User.findById(entry._id).select("name");
-        return {
-          rank: idx + 1,
+    const leaderboard = [];
+    let rank = 1;
+    for (const entry of results) {
+      const user = await User.findById(entry._id).select("name");
+      if (user) {
+        leaderboard.push({
+          rank: rank++,
           userId: entry._id,
-          name: user?.name || "Unknown",
+          name: user.name,
           solvedCount: entry.solvedCount,
-        };
-      })
-    );
+        });
+      }
+    }
 
-    res.json(leaderboard);
+    res.json(leaderboard.slice(0, 20));
   } catch (error) {
     console.error("Get leaderboard error:", error);
     res.status(500).json({ message: "Server error" });
