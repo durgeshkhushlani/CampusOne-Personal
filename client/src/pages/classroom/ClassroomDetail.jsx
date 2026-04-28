@@ -14,7 +14,7 @@ export default function ClassroomDetail() {
   const [activeTab, setActiveTab] = useState("feed"); // "feed" | "people" | "grades"
   
   const [showCreate, setShowCreate] = useState(false);
-  const [postForm, setPostForm] = useState({ title: "", content: "", type: "material", topic: "" });
+  const [postForm, setPostForm] = useState({ title: "", content: "", type: "material", topic: "", dueDate: "" });
   const [file, setFile] = useState(null);
 
   // Grades state (student only)
@@ -27,6 +27,17 @@ export default function ClassroomDetail() {
   // Submissions viewer state (faculty)
   const [expandedSubmissions, setExpandedSubmissions] = useState({}); // { postId: [submissions] }
   const [gradeInputs, setGradeInputs] = useState({}); // { submissionId: grade }
+
+  const getFileUrl = (fileUrl) => {
+    if (!fileUrl) return "";
+    if (fileUrl.startsWith("http")) return fileUrl;
+    const apiUrl = import.meta.env.VITE_API_URL || "";
+    if (apiUrl) {
+      const rootUrl = apiUrl.replace(/\/api$/, "");
+      return `${rootUrl}${fileUrl}`;
+    }
+    return `http://localhost:5000${fileUrl}`;
+  };
 
   const fetchData = async () => {
     try {
@@ -76,23 +87,44 @@ export default function ClassroomDetail() {
       formData.append("content", postForm.content);
       formData.append("type", postForm.type);
       formData.append("topic", postForm.topic || "General");
+      if (postForm.dueDate) {
+        formData.append("due_date", postForm.dueDate);
+      }
       if (file) {
-        // Enforce basic frontend limit (~10MB)
         if (file.size > 10 * 1024 * 1024) return alert("File size must be under 10MB");
         formData.append("file", file);
       }
 
-      await api.post("/classroom/posts", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      if (postForm._id) {
+        await api.put(`/classroom/posts/${postForm._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      } else {
+        await api.post("/classroom/posts", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+      }
       
       setShowCreate(false);
-      setPostForm({ title: "", content: "", type: "material", topic: "" });
+      setPostForm({ title: "", content: "", type: "material", topic: "", dueDate: "" });
       setFile(null);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to create post");
+      alert(err.response?.data?.error || "Failed to save post");
     }
+  };
+
+  const handleEditPost = (post) => {
+    setPostForm({
+      _id: post._id,
+      title: post.title,
+      content: post.content || "",
+      type: post.type,
+      topic: post.topic || "General",
+      dueDate: post.dueDate ? new Date(post.dueDate).toISOString().substring(0, 10) : "",
+    });
+    setShowCreate(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleStudentSubmit = async (postId, uploadFile) => {
@@ -324,7 +356,7 @@ export default function ClassroomDetail() {
               {showCreate && (
                 <form onSubmit={handleCreatePost} className="card bg-base-100 shadow mt-3 border border-base-300">
                   <div className="card-body space-y-4">
-                    <h3 className="font-bold text-lg mb-2">New Post</h3>
+                    <h3 className="font-bold text-lg mb-2">{postForm._id ? "✏ Edit Post" : "New Post"}</h3>
                     <select className="select select-bordered w-full" value={postForm.type} onChange={(e) => setPostForm({ ...postForm, type: e.target.value })}>
                       <option value="material">Material</option>
                       <option value="assignment">Assignment</option>
@@ -335,13 +367,27 @@ export default function ClassroomDetail() {
                     
                     <input className="input input-bordered w-full" placeholder="Topic (e.g. Unit 1, Homework — default: General)" value={postForm.topic} onChange={(e) => setPostForm({ ...postForm, topic: e.target.value })} />
 
+                    {postForm.type === "assignment" && (
+                      <div className="form-control">
+                        <label className="label"><span className="label-text">Due Date</span></label>
+                        <input type="date" className="input input-bordered w-full" value={postForm.dueDate || ""} onChange={(e) => setPostForm({ ...postForm, dueDate: e.target.value })} required />
+                      </div>
+                    )}
+
                     <div>
                       <label className="label"><span className="label-text">Attach File (Optional, max 10MB)</span></label>
                       <input type="file" className="file-input file-input-bordered file-input-sm w-full max-w-xs" onChange={(e) => setFile(e.target.files[0])} />
+                      {postForm.fileName && <p className="text-xs text-base-content/50 mt-1">Current file: {postForm.fileName}</p>}
                     </div>
 
-                    <div className="form-control mt-2">
-                       <button type="submit" className="btn btn-primary">Post</button>
+                    <div className="form-control mt-2 flex flex-row gap-2">
+                       <button type="submit" className="btn btn-primary">{postForm._id ? "Save Changes" : "Post"}</button>
+                       {postForm._id && (
+                         <button type="button" className="btn btn-ghost" onClick={() => {
+                           setPostForm({ title: "", content: "", type: "material", topic: "", dueDate: "" });
+                           setShowCreate(false);
+                         }}>Cancel Edit</button>
+                       )}
                     </div>
                   </div>
                 </form>
@@ -401,7 +447,7 @@ export default function ClassroomDetail() {
                             
                             {post.fileUrl && (
                               <div className="mt-3">
-                                 <a href={post.fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-xs btn-outline btn-info gap-2 normal-case">
+                                 <a href={getFileUrl(post.fileUrl)} target="_blank" rel="noopener noreferrer" className="btn btn-xs btn-outline btn-info gap-2 normal-case">
                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                    {post.fileName || "Download Attachment"}
                                  </a>
@@ -424,6 +470,13 @@ export default function ClassroomDetail() {
                                       title={post.isPinned ? "Unpin" : "Pin"}
                                     >
                                       📌 {post.isPinned ? "Unpin" : "Pin"}
+                                    </button>
+                                    <button
+                                      onClick={() => handleEditPost(post)}
+                                      className="btn btn-xs btn-ghost text-info"
+                                      title="Edit Post"
+                                    >
+                                      ✏ Edit
                                     </button>
                                     <button
                                       onClick={() => handleDeletePost(post._id)}

@@ -283,6 +283,43 @@ const deletePost = async (req, res) => {
   }
 };
 
+// PUT /api/classroom/posts/:post_id
+const updatePost = async (req, res) => {
+  try {
+    const { title, content, type, topic, due_date, total_points } = req.body;
+    const post = await Post.findById(req.params.post_id);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    // Authorization check
+    const classroom = await Classroom.findById(post.classroomId);
+    const isAuthor = post.authorId.toString() === req.user.userId.toString();
+    const isAssignedFaculty = classroom && classroom.facultyId && classroom.facultyId.toString() === req.user.userId.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isAuthor && !isAssignedFaculty && !isAdmin) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    post.title = title || post.title;
+    post.content = content !== undefined ? content : post.content;
+    post.type = type || post.type;
+    post.topic = topic || post.topic;
+    if (due_date !== undefined) post.dueDate = due_date || null;
+    if (total_points !== undefined) post.totalPoints = Number(total_points) || 100;
+
+    if (req.file) {
+      post.fileUrl = `/uploads/${req.file.filename}`;
+      post.fileName = req.file.originalname;
+    }
+
+    await post.save();
+    res.json(post);
+  } catch (error) {
+    console.error("Update post error:", error);
+    res.status(500).json({ error: "Failed to update post" });
+  }
+};
+
 module.exports = {
   createPost,
   getPostsByClassroom,
@@ -297,4 +334,5 @@ module.exports = {
   getMyGrades,
   togglePinPost,
   deletePost,
+  updatePost,
 };
