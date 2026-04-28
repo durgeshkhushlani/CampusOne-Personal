@@ -87,8 +87,8 @@ export default function ClassroomDetail() {
       formData.append("content", postForm.content);
       formData.append("type", postForm.type);
       formData.append("topic", postForm.topic || "General");
-      if (postForm.dueDate) {
-        formData.append("due_date", postForm.dueDate);
+      if (postForm.type === "assignment") {
+        formData.append("due_date", postForm.dueDate || "");
       }
       if (file) {
         if (file.size > 10 * 1024 * 1024) return alert("File size must be under 10MB");
@@ -348,7 +348,7 @@ export default function ClassroomDetail() {
       {activeTab === "feed" && (
         <>
           {/* Create Post */}
-          {user?.role === "faculty" && (
+          {(user?.role === "faculty" || user?.role === "admin") && (
             <div className="mb-6">
               <button className="btn btn-primary btn-sm shadow-sm" onClick={() => setShowCreate(!showCreate)}>
                 {showCreate ? "Cancel Posting" : "+ Create Post"}
