@@ -16,6 +16,10 @@ const uploadToCloudinary = async (filePath, originalName) => {
   try {
     if (!filePath) return null;
 
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      throw new Error("Cloudinary keys are missing in server Environment Variables.");
+    }
+
     const ext = originalName ? path.extname(originalName) : ".pdf";
     const publicId = `${Date.now()}${ext}`;
 
