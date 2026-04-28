@@ -45,14 +45,24 @@ const submitApplication = async (req, res) => {
       const cgpaStr = extractCGPA(parsedAns || []);
       const studentCGPA = cgpaStr !== "N/A" ? parseFloat(cgpaStr) : (studentProfile.cgpa || 0);
       if (company.minCGPA && company.minCGPA > 0 && studentCGPA < company.minCGPA) {
-        return res.status(403).json({ message: "You do not meet the eligibility criteria for this company." });
+        return res.status(403).json({ 
+          message: `Your CGPA (${studentCGPA}) does not meet the minimum requirement of ${company.minCGPA} for this company.` 
+        });
       }
       // Check branch/department
       if (company.eligibleBranches && company.eligibleBranches.length > 0) {
         const dept = (studentProfile.department || "").toLowerCase().trim();
         const eligible = company.eligibleBranches.map(b => b.toLowerCase().trim());
-        if (!eligible.includes(dept)) {
-          return res.status(403).json({ message: "You do not meet the eligibility criteria for this company." });
+        
+        // Relaxed check: substring match
+        const isEligible = eligible.some(b => 
+          dept.includes(b) || b.includes(dept)
+        );
+        
+        if (!isEligible) {
+          return res.status(403).json({ 
+            message: `Your department (${studentProfile.department || "Not Set"}) is not eligible for this company. Eligible branches: ${company.eligibleBranches.join(", ")}` 
+          });
         }
       }
     }
